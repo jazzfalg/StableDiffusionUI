@@ -2,7 +2,7 @@
     let userprompt = "";
     let result = "";
     let imgHistory = [];
-    let steps = 5;
+    let steps = 20;
     let cfgScale = 7;
     let processing = false;
 
