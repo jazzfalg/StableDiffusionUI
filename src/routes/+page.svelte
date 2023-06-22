@@ -1,20 +1,22 @@
 <script>
     let userprompt = "";
     let result = "";
+    let history = [];
+    let steps = 5;
+
+    function onKeyDown(e) {
+        if (e.key === "Enter" || e.keyCode === 13) {
+            sendPrompt();
+        }
+    }
 
     async function sendPrompt() {
-        console.log(userprompt);
+        console.log("Sending " + userprompt);
 
-        // let response = await fetch("http://127.0.0.1:7860/sdapi/v1/txt2img", {
-        //     method: "POST",
-        //     headers: {
-        //         "Content-Type": "application/json",
-        //         Accept: "application/json",
-        //     },
-        //     body: JSON.stringify(buildPrompt()),
-        // });
-
-        // console.log(response);
+        if (userprompt == "") {
+            alert("No Prompt");
+            return;
+        }
 
         await fetch("http://127.0.0.1:7860/sdapi/v1/txt2img", {
             method: "POST",
@@ -28,18 +30,19 @@
             .then((data) => {
                 console.log(data);
                 var image = new Image();
-                image.src = "data:image/png;base64,"+ data['images'][0];
+                image.src = "data:image/png;base64," + data["images"][0];
                 result = image.src;
+
+                history.push(image);
             })
             .catch((err) => console.log(err));
     }
 
     function buildPrompt() {
         let rawprompt = {
-            prompt: "maltese puppy",
-            steps: 20,
+            prompt: userprompt,
+            steps: steps,
         };
-
         return rawprompt;
     }
 </script>
@@ -677,7 +680,11 @@
                 <div class="content2">Content</div>
 
                 <div class="rectangle-24" />
-                <input value={userprompt} class="rectangle-24" />
+                <input
+                    bind:value={userprompt}
+                    on:keydown={onKeyDown}
+                    class="rectangle-24"
+                />
 
                 <!-- <div class="a-mouse-chasing-a-cat">A mouse chasing a cat</div> -->
             </div>
@@ -1150,7 +1157,9 @@
         </div>
 
         <div class="buttons">
-            <button class="button" on:click={sendPrompt}> Generate </button>
+            <button class="button" on:click={() => sendPrompt(userprompt)}>
+                Generate
+            </button>
 
             <div class="button3">
                 <div class="button4">Save Configuration</div>
