@@ -1,8 +1,10 @@
 <script>
     let userprompt = "";
     let result = "";
-    let history = [];
+    let imgHistory = [];
     let steps = 5;
+    let cfgScale = 7;
+    let processing = false;
 
     function onKeyDown(e) {
         if (e.key === "Enter" || e.keyCode === 13) {
@@ -11,12 +13,23 @@
     }
 
     async function sendPrompt() {
-        console.log("Sending " + userprompt);
+        if (processing) return;
 
         if (userprompt == "") {
             alert("No Prompt");
             return;
         }
+
+        console.log('Sending: "' + userprompt + '"');
+
+        processing = true;
+
+        let counter = setInterval(function () {
+            checkProgress();
+            if (!processing) {
+                clearInterval(counter);
+            }
+        }, 500);
 
         await fetch("http://127.0.0.1:7860/sdapi/v1/txt2img", {
             method: "POST",
@@ -28,12 +41,14 @@
         })
             .then((res) => res.json())
             .then((data) => {
+                checkProgress();
                 console.log(data);
                 var image = new Image();
                 image.src = "data:image/png;base64," + data["images"][0];
                 result = image.src;
 
-                history.push(image);
+                imgHistory.push(image);
+                processing = false;
             })
             .catch((err) => console.log(err));
     }
@@ -42,8 +57,27 @@
         let rawprompt = {
             prompt: userprompt,
             steps: steps,
+            cfg_scale: cfgScale,
         };
         return rawprompt;
+    }
+
+    async function checkProgress() {
+        fetch(
+            "http://127.0.0.1:7860/sdapi/v1/progress?skip_current_image=false",
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+            }
+        )
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data);
+            })
+            .catch((err) => console.log(err));
     }
 </script>
 
@@ -683,7 +717,7 @@
                 <input
                     bind:value={userprompt}
                     on:keydown={onKeyDown}
-                    class="rectangle-24"
+                    class="a-mouse-chasing-a-cat"
                 />
 
                 <!-- <div class="a-mouse-chasing-a-cat">A mouse chasing a cat</div> -->
@@ -2289,16 +2323,26 @@
         position: absolute;
         left: 0px;
         top: 31px;
+        display: block;
     }
     .a-mouse-chasing-a-cat {
         color: var(--bluetext, #47536b);
+        background: var(--bluebackground, #edeef3);
         text-align: left;
+        text-indent: 1em;
         font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        border-radius: 6px;
+        border-style: solid;
+        border-color: var(--bluemid, #94a0b8);
+        border-width: 1px;
+        width: 290px;
+        height: 66px;
         position: absolute;
-        left: 8px;
-        top: 39px;
-        width: 274px;
-        height: 34px;
+        display: block;
+        /* left: 8px;*/
+        top: 31px;
+        /* width: 274px;
+        height: 34px; */
     }
     .raw-prompt {
         width: 290px;
