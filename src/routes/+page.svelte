@@ -1,16 +1,31 @@
 <script>
     let userprompt = "";
-    let result = "";
+    let result = "result_before.png";
     let imgHistory = [];
-    let steps = 20;
+    let steps = 2;
     let cfgScale = 7;
     let processing = false;
+    let percentage = 0;
+    let time = "00:00:00";
+    let rawprompt = "";
+    let medium = "";
+    let tags = "";
+
+    // 172.17.11.23:7860
 
     function onKeyDown(e) {
         if (e.key === "Enter" || e.keyCode === 13) {
             sendPrompt();
         }
     }
+
+    setInterval(function () {rawprompt = medium + userprompt + tags}, 0);
+
+    // function addMedium(add)
+    // {
+    //     rawprompt = add += userprompt ;
+
+    // }
 
     async function sendPrompt() {
         if (processing) return;
@@ -20,7 +35,9 @@
             return;
         }
 
-        console.log('Sending: "' + userprompt + '"');
+        result = "result_before.png";
+
+        console.log('Sending: "' + rawprompt + '"');
 
         processing = true;
 
@@ -29,7 +46,7 @@
             if (!processing) {
                 clearInterval(counter);
             }
-        }, 500);
+        }, 200);
 
         await fetch("http://127.0.0.1:7860/sdapi/v1/txt2img", {
             method: "POST",
@@ -41,28 +58,72 @@
         })
             .then((res) => res.json())
             .then((data) => {
-                checkProgress();
+                processing = false;
                 console.log(data);
                 var image = new Image();
                 image.src = "data:image/png;base64," + data["images"][0];
                 result = image.src;
+                percentage = 100;
+                time = "00:00:00";
 
                 imgHistory.push(image);
-                processing = false;
             })
             .catch((err) => console.log(err));
     }
 
     function buildPrompt() {
-        let rawprompt = {
-            prompt: userprompt,
-            steps: steps,
-            cfg_scale: cfgScale,
+        // let rawprompt = {
+        //     prompt: userprompt,
+        //     steps: steps,
+        //     cfg_scale: cfgScale,
+        // };
+
+        let payload = {
+            enable_hr: false,
+            denoising_strength: 0,
+            firstphase_width: 0,
+            firstphase_height: 0,
+            hr_scale: 2,
+            hr_second_pass_steps: 0,
+            hr_resize_x: 0,
+            hr_resize_y: 0,
+            prompt: rawprompt,
+            seed: -1,
+            subseed: -1,
+            subseed_strength: 0,
+            seed_resize_from_h: -1,
+            seed_resize_from_w: -1,
+            sampler_name: "LMS",
+            batch_size: 1,
+            n_iter: 1,
+            steps: 20,
+            cfg_scale: 7,
+            width: 128,
+            height: 128,
+            restore_faces: false,
+            tiling: false,
+            do_not_save_samples: false,
+            do_not_save_grid: false,
+            negative_prompt: "",
+            eta: 0,
+            s_churn: 0,
+            s_tmax: 0,
+            s_tmin: 0,
+            s_noise: 1,
+            override_settings: {},
+            override_settings_restore_afterwards: true,
+            script_args: [],
+            sampler_index: "k_lms",
+            send_images: true,
+            save_images: false,
+            alwayson_scripts: {},
         };
-        return rawprompt;
+        return payload;
     }
 
-    async function checkProgress() {
+    function checkProgress() {
+        if (!processing) return;
+
         fetch(
             "http://127.0.0.1:7860/sdapi/v1/progress?skip_current_image=false",
             {
@@ -76,1146 +137,21 @@
             .then((res) => res.json())
             .then((data) => {
                 console.log(data);
+                percentage = Math.round(data.progress * 100);
+                time = new Date(data.eta_relative * 1000).toISOString().slice(11, 19);
+                var currentImage = new Image();
+                currentImage.src ="data:image/png;base64," + data["current_image"];
+                if(data["current_image"] != null)
+                result = currentImage.src;
             })
             .catch((err) => console.log(err));
     }
 </script>
 
-<div class="Mainframe">
-    <div class="style">
-        <div class="tags">
-            <div class="tags2">Tags</div>
-
-            <div class="scroll-bar">
-                <div class="rectangle-8" />
-
-                <div class="rectangle-9" />
-            </div>
-
-            <div class="medium">
-                <div class="medium2">Medium</div>
-
-                <div class="kacheln">
-                    <div class="kachel">
-                        <div class="photography">Photography</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-                    </div>
-
-                    <div class="kachel2">
-                        <div class="photography">Graphic</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-                    </div>
-
-                    <div class="kachel3">
-                        <div class="photography">Rendering</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-                    </div>
-
-                    <div class="kachel4">
-                        <div class="photography">Print</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-                    </div>
-
-                    <div class="kachel5">
-                        <div class="photography2">Painting</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-                    </div>
-
-                    <div class="kachel6">
-                        <div class="photography">Digital Art</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-                    </div>
-
-                    <div class="kachel7">
-                        <div class="photography">Drawing</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-                    </div>
-                </div>
-
-                <div class="kachel8">
-                    <div class="new-idea">New Idea</div>
-
-                    <div class="frame-1">
-                        <img class="rectangle-72" src="rectangle-72.png" />
-                    </div>
-
-                    <svg
-                        class="_32-px-add-filled"
-                        width="32"
-                        height="32"
-                        viewBox="0 0 32 32"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M16 2C12.3009 2.04476 8.76586 3.53412 6.14999 6.14999C3.53412 8.76586 2.04476 12.3009 2 16C2.04476 19.6991 3.53412 23.2341 6.14999 25.85C8.76586 28.4659 12.3009 29.9552 16 30C19.6991 29.9552 23.2341 28.4659 25.85 25.85C28.4659 23.2341 29.9552 19.6991 30 16C29.9552 12.3009 28.4659 8.76586 25.85 6.14999C23.2341 3.53412 19.6991 2.04476 16 2V2ZM24 17H17V24H15V17H8V15H15V8H17V15H24V17Z"
-                            fill="#FAFAFA"
-                        />
-                    </svg>
-                </div>
-
-                <div class="divider" />
-            </div>
-
-            <div class="techniques">
-                <div class="techniques2">Techniques</div>
-
-                <div class="optional">optional</div>
-
-                <div class="drop-down">
-                    <div class="drop-down2">most relevant</div>
-
-                    <svg
-                        class="_8-px-caret-sort"
-                        width="8"
-                        height="8"
-                        viewBox="0 0 8 8"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z"
-                            fill="#47536B"
-                        />
-                    </svg>
-                </div>
-
-                <div class="frame-18">
-                    <div class="chip">
-                        <div class="chip2">Photography</div>
-                    </div>
-
-                    <div class="chip3">
-                        <div class="chip2">Rendering</div>
-                    </div>
-
-                    <div class="chip4">
-                        <div class="chip2">Drawing</div>
-                    </div>
-
-                    <div class="chip5">
-                        <div class="chip2">Graphic</div>
-                    </div>
-
-                    <div class="chip6">
-                        <div class="chip2">Print</div>
-                    </div>
-
-                    <div class="chip7">
-                        <div class="chip2">Digital Art</div>
-                    </div>
-
-                    <div class="chip8">
-                        <div class="chip2">Other</div>
-                    </div>
-
-                    <div class="chip9">
-                        <div class="chip10">Painting</div>
-                    </div>
-                </div>
-
-                <div class="show-more">
-                    <svg
-                        class="_10-px-chevron-down"
-                        width="10"
-                        height="10"
-                        viewBox="0 0 10 10"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M5 6.875L1.875 3.75L2.3125 3.3125L5 6L7.6875 3.3125L8.125 3.75L5 6.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
-
-                    <div class="show-more2">show more</div>
-                </div>
-
-                <div class="divider2" />
-
-                <div class="kacheln2">
-                    <div class="kachel">
-                        <div class="photography3">Oil</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel2">
-                        <div class="photography3">Chiaroscuro</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox2"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel9">
-                        <div class="photography3">Pointilism</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox3"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel3">
-                        <div class="photography3">Ink</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox4"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel10">
-                        <div class="photography4">Watercolor</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox-checked-filled"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM4.375 6.71875L2.8125 5.16959L3.30963 4.6875L4.375 5.733L6.69022 3.4375L7.18766 3.93037L4.375 6.71875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel11">
-                        <div class="photography3">Impasto</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox5"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel12">
-                        <div class="photography3">Brush</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox6"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel6">
-                        <div class="photography3">Sgraffito</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox7"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel13">
-                        <div class="photography3">Stippling</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox8"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel7">
-                        <div class="photography3">Graffiti</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox9"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel14">
-                        <div class="photography4">Alla Prima</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox-checked-filled2"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM4.375 6.71875L2.8125 5.16959L3.30963 4.6875L4.375 5.733L6.69022 3.4375L7.18766 3.93037L4.375 6.71875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel15">
-                        <div class="photography3">Glazing</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox10"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <div class="styles">
-                <div class="styles2">Styles</div>
-
-                <div class="optional2">optional</div>
-
-                <div class="drop-down">
-                    <div class="drop-down2">most relevant</div>
-
-                    <svg
-                        class="_8-px-caret-sort2"
-                        width="8"
-                        height="8"
-                        viewBox="0 0 8 8"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z"
-                            fill="#47536B"
-                        />
-                    </svg>
-                </div>
-
-                <div class="style-tabs">
-                    <div class="chip11">
-                        <div class="chip2">Effects</div>
-                    </div>
-
-                    <div class="chip11">
-                        <div class="chip2">Materials</div>
-                    </div>
-
-                    <div class="chip11">
-                        <div class="chip2">Concepts</div>
-                    </div>
-
-                    <div class="chip12">
-                        <div class="chip10">Movements</div>
-                    </div>
-
-                    <div class="chip11">
-                        <div class="chip2">Other</div>
-                    </div>
-                </div>
-
-                <div class="divider3" />
-
-                <div class="kacheln3">
-                    <div class="kachel">
-                        <div class="photography3">Cubism</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox11"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel2">
-                        <div class="photography3">Descriptions</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox12"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel3">
-                        <div class="photography3">Surrealism</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox13"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel4">
-                        <div class="photography3">Descriptions</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox14"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel12">
-                        <div class="photography3">Renaissance</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox15"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel6">
-                        <div class="photography3">Descriptions</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox16"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel7">
-                        <div class="photography3">Pop Art</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox17"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-
-                    <div class="kachel16">
-                        <div class="photography3">Descriptions</div>
-
-                        <img class="rectangle-7" src="rectangle-7.png" />
-
-                        <svg
-                            class="_8-px-checkbox18"
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM1.875 8.125V1.875H8.125V8.125H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <div class="rectangle-23" />
-        </div>
-
-        <div class="prompt">
-            <div class="prompt2">Prompt</div>
-
-            <div class="negative-content">
-                <div class="negative-content2">Negative Content</div>
-
-                <div class="rectangle-25" />
-
-                <div class="what-shouldn-t-be-on-the-image">
-                    What shouldn’t be on the image?
-                </div>
-            </div>
-
-            <div class="content">
-                <div class="content2">Content</div>
-
-                <div class="rectangle-24" />
-                <input
-                    bind:value={userprompt}
-                    on:keydown={onKeyDown}
-                    class="a-mouse-chasing-a-cat"
-                />
-
-                <!-- <div class="a-mouse-chasing-a-cat">A mouse chasing a cat</div> -->
-            </div>
-
-            <div class="raw-prompt">
-                <div class="raw-prompt2">Raw Prompt</div>
-
-                <div class="rectangle-24" />
-
-                <div
-                    class="a-painting-of-a-mouse-chasing-a-cat-painted-with-watercolors-0-3-in-alla-prima-1-2-style"
-                >
-                    {userprompt}
-                </div>
-
-                <svg
-                    class="_16-px-chevron-down"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M8 5.0002L13 10.0002L12.3 10.7002L8 6.40019L3.7 10.7002L3 10.0002L8 5.0002Z"
-                        fill="#47536B"
-                    />
-                </svg>
-            </div>
-
-            <div class="tags3">
-                <div class="tags4">Tags</div>
-
-                <div class="frame-19">
-                    <div class="tag">
-                        <div class="frame-192">
-                            <svg
-                                class="_8-px-close-filled"
-                                width="8"
-                                height="8"
-                                viewBox="0 0 8 8"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M4 0.5C2.05 0.5 0.5 2.05 0.5 4C0.5 5.95 2.05 7.5 4 7.5C5.95 7.5 7.5 5.95 7.5 4C7.5 2.05 5.95 0.5 4 0.5ZM5.35 5.75L4 4.4L2.65 5.75L2.25 5.35L3.6 4L2.25 2.65L2.65 2.25L4 3.6L5.35 2.25L5.75 2.65L4.4 4L5.75 5.35L5.35 5.75Z"
-                                    fill="#FAFAFA"
-                                />
-                            </svg>
-
-                            <div class="tag2">Painting</div>
-                        </div>
-
-                        <div class="frame-20">
-                            <svg
-                                class="_8-px-subtract"
-                                width="8"
-                                height="8"
-                                viewBox="0 0 8 8"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
-                                    fill="#FAFAFA"
-                                />
-                                <path
-                                    d="M2 3.75H6V4.25H2V3.75Z"
-                                    fill="#FAFAFA"
-                                />
-                            </svg>
-
-                            <div class="_1-0">1,0</div>
-
-                            <svg
-                                class="_8-px-add"
-                                width="8"
-                                height="8"
-                                viewBox="0 0 8 8"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
-                                    fill="#FAFAFA"
-                                />
-                                <path
-                                    d="M6 3.75H4.25V2H3.75V3.75H2V4.25H3.75V6H4.25V4.25H6V3.75Z"
-                                    fill="#FAFAFA"
-                                />
-                            </svg>
-                        </div>
-                    </div>
-
-                    <div class="tag3">
-                        <div class="frame-192">
-                            <svg
-                                class="_8-px-close-filled2"
-                                width="8"
-                                height="8"
-                                viewBox="0 0 8 8"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M4 0.5C2.05 0.5 0.5 2.05 0.5 4C0.5 5.95 2.05 7.5 4 7.5C5.95 7.5 7.5 5.95 7.5 4C7.5 2.05 5.95 0.5 4 0.5ZM5.35 5.75L4 4.4L2.65 5.75L2.25 5.35L3.6 4L2.25 2.65L2.65 2.25L4 3.6L5.35 2.25L5.75 2.65L4.4 4L5.75 5.35L5.35 5.75Z"
-                                    fill="#FAFAFA"
-                                />
-                            </svg>
-
-                            <div class="tag2">Watercolor</div>
-                        </div>
-
-                        <div class="frame-20">
-                            <svg
-                                class="_8-px-subtract2"
-                                width="8"
-                                height="8"
-                                viewBox="0 0 8 8"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
-                                    fill="#FAFAFA"
-                                />
-                                <path
-                                    d="M2 3.75H6V4.25H2V3.75Z"
-                                    fill="#FAFAFA"
-                                />
-                            </svg>
-
-                            <div class="_1-0">0,3</div>
-
-                            <svg
-                                class="_8-px-add2"
-                                width="8"
-                                height="8"
-                                viewBox="0 0 8 8"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
-                                    fill="#FAFAFA"
-                                />
-                                <path
-                                    d="M6 3.75H4.25V2H3.75V3.75H2V4.25H3.75V6H4.25V4.25H6V3.75Z"
-                                    fill="#FAFAFA"
-                                />
-                            </svg>
-                        </div>
-                    </div>
-
-                    <div class="tag4">
-                        <div class="frame-192">
-                            <svg
-                                class="_8-px-close-filled3"
-                                width="8"
-                                height="8"
-                                viewBox="0 0 8 8"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M4 0.5C2.05 0.5 0.5 2.05 0.5 4C0.5 5.95 2.05 7.5 4 7.5C5.95 7.5 7.5 5.95 7.5 4C7.5 2.05 5.95 0.5 4 0.5ZM5.35 5.75L4 4.4L2.65 5.75L2.25 5.35L3.6 4L2.25 2.65L2.65 2.25L4 3.6L5.35 2.25L5.75 2.65L4.4 4L5.75 5.35L5.35 5.75Z"
-                                    fill="#FAFAFA"
-                                />
-                            </svg>
-
-                            <div class="tag2">Alla Prima</div>
-                        </div>
-
-                        <div class="frame-20">
-                            <svg
-                                class="_8-px-subtract3"
-                                width="8"
-                                height="8"
-                                viewBox="0 0 8 8"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
-                                    fill="#FAFAFA"
-                                />
-                                <path
-                                    d="M2 3.75H6V4.25H2V3.75Z"
-                                    fill="#FAFAFA"
-                                />
-                            </svg>
-
-                            <div class="_1-0">1,2</div>
-
-                            <svg
-                                class="_8-px-add3"
-                                width="8"
-                                height="8"
-                                viewBox="0 0 8 8"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
-                                    fill="#FAFAFA"
-                                />
-                                <path
-                                    d="M6 3.75H4.25V2H3.75V3.75H2V4.25H3.75V6H4.25V4.25H6V3.75Z"
-                                    fill="#FAFAFA"
-                                />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="divider4" />
-        </div>
-
-        <div class="settings">
-            <div class="settings2">Settings</div>
-
-            <div class="resolution">
-                <div class="input-field">
-                    <div class="input">512px</div>
-                </div>
-
-                <div class="input-field2">
-                    <div class="input">512px</div>
-                </div>
-
-                <div class="width">Width</div>
-
-                <div class="hight">Hight</div>
-
-                <div class="resolution2">Resolution</div>
-            </div>
-
-            <div class="divider5" />
-
-            <div class="model">
-                <div class="drop-down3">
-                    <div class="drop-down2">v1-5-pruned-ckpt</div>
-
-                    <svg
-                        class="_8-px-caret-sort3"
-                        width="8"
-                        height="8"
-                        viewBox="0 0 8 8"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z"
-                            fill="#47536B"
-                        />
-                    </svg>
-                </div>
-
-                <div class="model2">Model</div>
-
-                <svg
-                    class="_12-px-help"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M6 0.75C3.075 0.75 0.75 3.075 0.75 6C0.75 8.925 3.075 11.25 6 11.25C8.925 11.25 11.25 8.925 11.25 6C11.25 3.075 8.925 0.75 6 0.75ZM6 10.5C3.525 10.5 1.5 8.475 1.5 6C1.5 3.525 3.525 1.5 6 1.5C8.475 1.5 10.5 3.525 10.5 6C10.5 8.475 8.475 10.5 6 10.5Z"
-                        fill="#47536B"
-                    />
-                    <path
-                        d="M6.00039 9.45C6.33176 9.45 6.60039 9.18137 6.60039 8.85C6.60039 8.51863 6.33176 8.25 6.00039 8.25C5.66902 8.25 5.40039 8.51863 5.40039 8.85C5.40039 9.18137 5.66902 9.45 6.00039 9.45Z"
-                        fill="#47536B"
-                    />
-                    <path
-                        d="M6.375 3H5.85C4.875 3 4.125 3.75 4.125 4.65V4.8H4.875V4.65C4.875 4.2 5.325 3.75 5.85 3.75H6.45C6.975 3.75 7.35 4.2 7.35 4.65C7.35 5.1 6.9 5.625 6.375 5.625H5.625V7.275H6.375V6.375C7.275 6.375 8.025 5.625 8.025 4.725C8.025 3.825 7.275 3 6.375 3Z"
-                        fill="#47536B"
-                    />
-                </svg>
-            </div>
-
-            <div class="sampler">
-                <div class="drop-down3">
-                    <div class="drop-down2">Euler a</div>
-
-                    <svg
-                        class="_8-px-caret-sort4"
-                        width="8"
-                        height="8"
-                        viewBox="0 0 8 8"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z"
-                            fill="#47536B"
-                        />
-                    </svg>
-                </div>
-
-                <div class="sampler2">Sampler</div>
-
-                <svg
-                    class="_12-px-help2"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M6 0.75C3.075 0.75 0.75 3.075 0.75 6C0.75 8.925 3.075 11.25 6 11.25C8.925 11.25 11.25 8.925 11.25 6C11.25 3.075 8.925 0.75 6 0.75ZM6 10.5C3.525 10.5 1.5 8.475 1.5 6C1.5 3.525 3.525 1.5 6 1.5C8.475 1.5 10.5 3.525 10.5 6C10.5 8.475 8.475 10.5 6 10.5Z"
-                        fill="#47536B"
-                    />
-                    <path
-                        d="M6.00039 9.45C6.33176 9.45 6.60039 9.18137 6.60039 8.85C6.60039 8.51863 6.33176 8.25 6.00039 8.25C5.66902 8.25 5.40039 8.51863 5.40039 8.85C5.40039 9.18137 5.66902 9.45 6.00039 9.45Z"
-                        fill="#47536B"
-                    />
-                    <path
-                        d="M6.375 3H5.85C4.875 3 4.125 3.75 4.125 4.65V4.8H4.875V4.65C4.875 4.2 5.325 3.75 5.85 3.75H6.45C6.975 3.75 7.35 4.2 7.35 4.65C7.35 5.1 6.9 5.625 6.375 5.625H5.625V7.275H6.375V6.375C7.275 6.375 8.025 5.625 8.025 4.725C8.025 3.825 7.275 3 6.375 3Z"
-                        fill="#47536B"
-                    />
-                </svg>
-            </div>
-
-            <div class="seed">
-                <div class="input-field3">
-                    <div class="input2">random</div>
-                </div>
-
-                <div class="seed2">Seed</div>
-
-                <svg
-                    class="_12-px-help3"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M6 0.75C3.075 0.75 0.75 3.075 0.75 6C0.75 8.925 3.075 11.25 6 11.25C8.925 11.25 11.25 8.925 11.25 6C11.25 3.075 8.925 0.75 6 0.75ZM6 10.5C3.525 10.5 1.5 8.475 1.5 6C1.5 3.525 3.525 1.5 6 1.5C8.475 1.5 10.5 3.525 10.5 6C10.5 8.475 8.475 10.5 6 10.5Z"
-                        fill="#47536B"
-                    />
-                    <path
-                        d="M6.00039 9.45C6.33176 9.45 6.60039 9.18137 6.60039 8.85C6.60039 8.51863 6.33176 8.25 6.00039 8.25C5.66902 8.25 5.40039 8.51863 5.40039 8.85C5.40039 9.18137 5.66902 9.45 6.00039 9.45Z"
-                        fill="#47536B"
-                    />
-                    <path
-                        d="M6.375 3H5.85C4.875 3 4.125 3.75 4.125 4.65V4.8H4.875V4.65C4.875 4.2 5.325 3.75 5.85 3.75H6.45C6.975 3.75 7.35 4.2 7.35 4.65C7.35 5.1 6.9 5.625 6.375 5.625H5.625V7.275H6.375V6.375C7.275 6.375 8.025 5.625 8.025 4.725C8.025 3.825 7.275 3 6.375 3Z"
-                        fill="#47536B"
-                    />
-                </svg>
-            </div>
-
-            <div class="guidance">
-                <div class="guidance-scale">Guidance Scale</div>
-
-                <div class="input-field4">
-                    <div class="input">15</div>
-                </div>
-
-                <div class="slider">
-                    <div class="rectangle-252" />
-
-                    <div class="ellipse-12" />
-                </div>
-
-                <svg
-                    class="_12-px-help4"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M6 0.75C3.075 0.75 0.75 3.075 0.75 6C0.75 8.925 3.075 11.25 6 11.25C8.925 11.25 11.25 8.925 11.25 6C11.25 3.075 8.925 0.75 6 0.75ZM6 10.5C3.525 10.5 1.5 8.475 1.5 6C1.5 3.525 3.525 1.5 6 1.5C8.475 1.5 10.5 3.525 10.5 6C10.5 8.475 8.475 10.5 6 10.5Z"
-                        fill="#47536B"
-                    />
-                    <path
-                        d="M6.00039 9.45C6.33176 9.45 6.60039 9.18137 6.60039 8.85C6.60039 8.51863 6.33176 8.25 6.00039 8.25C5.66902 8.25 5.40039 8.51863 5.40039 8.85C5.40039 9.18137 5.66902 9.45 6.00039 9.45Z"
-                        fill="#47536B"
-                    />
-                    <path
-                        d="M6.375 3H5.85C4.875 3 4.125 3.75 4.125 4.65V4.8H4.875V4.65C4.875 4.2 5.325 3.75 5.85 3.75H6.45C6.975 3.75 7.35 4.2 7.35 4.65C7.35 5.1 6.9 5.625 6.375 5.625H5.625V7.275H6.375V6.375C7.275 6.375 8.025 5.625 8.025 4.725C8.025 3.825 7.275 3 6.375 3Z"
-                        fill="#47536B"
-                    />
-                </svg>
-            </div>
-
-            <div class="steps">
-                <div class="steps2">Steps</div>
-
-                <div class="input-field4">
-                    <div class="input">45</div>
-                </div>
-
-                <div class="slider">
-                    <div class="rectangle-252" />
-
-                    <div class="ellipse-12" />
-                </div>
-
-                <svg
-                    class="_12-px-help5"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M6 0.75C3.075 0.75 0.75 3.075 0.75 6C0.75 8.925 3.075 11.25 6 11.25C8.925 11.25 11.25 8.925 11.25 6C11.25 3.075 8.925 0.75 6 0.75ZM6 10.5C3.525 10.5 1.5 8.475 1.5 6C1.5 3.525 3.525 1.5 6 1.5C8.475 1.5 10.5 3.525 10.5 6C10.5 8.475 8.475 10.5 6 10.5Z"
-                        fill="#47536B"
-                    />
-                    <path
-                        d="M6.00039 9.45C6.33176 9.45 6.60039 9.18137 6.60039 8.85C6.60039 8.51863 6.33176 8.25 6.00039 8.25C5.66902 8.25 5.40039 8.51863 5.40039 8.85C5.40039 9.18137 5.66902 9.45 6.00039 9.45Z"
-                        fill="#47536B"
-                    />
-                    <path
-                        d="M6.375 3H5.85C4.875 3 4.125 3.75 4.125 4.65V4.8H4.875V4.65C4.875 4.2 5.325 3.75 5.85 3.75H6.45C6.975 3.75 7.35 4.2 7.35 4.65C7.35 5.1 6.9 5.625 6.375 5.625H5.625V7.275H6.375V6.375C7.275 6.375 8.025 5.625 8.025 4.725C8.025 3.825 7.275 3 6.375 3Z"
-                        fill="#47536B"
-                    />
-                </svg>
-            </div>
-
-            <div class="batch">
-                <div class="input-field">
-                    <div class="input">4</div>
-                </div>
-
-                <div class="input-field2">
-                    <div class="input">1</div>
-                </div>
-
-                <div class="count">Count</div>
-
-                <div class="size">Size</div>
-
-                <div class="batch2">Batch</div>
-
-                <svg
-                    class="_12-px-help6"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M6 0.75C3.075 0.75 0.75 3.075 0.75 6C0.75 8.925 3.075 11.25 6 11.25C8.925 11.25 11.25 8.925 11.25 6C11.25 3.075 8.925 0.75 6 0.75ZM6 10.5C3.525 10.5 1.5 8.475 1.5 6C1.5 3.525 3.525 1.5 6 1.5C8.475 1.5 10.5 3.525 10.5 6C10.5 8.475 8.475 10.5 6 10.5Z"
-                        fill="#47536B"
-                    />
-                    <path
-                        d="M6.00039 9.45C6.33176 9.45 6.60039 9.18137 6.60039 8.85C6.60039 8.51863 6.33176 8.25 6.00039 8.25C5.66902 8.25 5.40039 8.51863 5.40039 8.85C5.40039 9.18137 5.66902 9.45 6.00039 9.45Z"
-                        fill="#47536B"
-                    />
-                    <path
-                        d="M6.375 3H5.85C4.875 3 4.125 3.75 4.125 4.65V4.8H4.875V4.65C4.875 4.2 5.325 3.75 5.85 3.75H6.45C6.975 3.75 7.35 4.2 7.35 4.65C7.35 5.1 6.9 5.625 6.375 5.625H5.625V7.275H6.375V6.375C7.275 6.375 8.025 5.625 8.025 4.725C8.025 3.825 7.275 3 6.375 3Z"
-                        fill="#47536B"
-                    />
-                </svg>
-            </div>
-
-            <div class="divider6" />
-        </div>
-
-        <div class="buttons">
-            <button class="button" on:click={() => sendPrompt(userprompt)}>
-                Generate
-            </button>
-
-            <div class="button3">
-                <div class="button4">Save Configuration</div>
-            </div>
-
-            <div class="button5">
-                <div class="button4">Open Configurations</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="top-bar">
-        <div class="ellipse-13" />
-
-        <div class="ellipse-15" />
-
-        <div class="ellipse-16" />
-    </div>
-
-    <div class="frame-32">
-        <div class="history">
-            <div class="frame-25">
+<div class="main">
+    <div class="history">
+        <div class="batches">
+            <div class="batch-1">
                 <img class="_00009-1938723002" src="_00009-1938723002.png" />
 
                 <img class="_00014-446255131" src="_00014-446255131.png" />
@@ -1228,7 +164,27 @@
                 />
             </div>
 
-            <div class="frame-252">
+            <div class="batch-2">
+                <img class="_00009-446255139" src="_00009-446255139.png" />
+
+                <img class="_00010-446255140" src="_00010-446255140.png" />
+
+                <img class="_00011-446255141" src="_00011-446255141.png" />
+
+                <img class="_00012-446255142" src="_00012-446255142.png" />
+            </div>
+
+            <div class="batch-3">
+                <img class="_00013-446255143" src="_00013-446255143.png" />
+
+                <img class="_00014-446255144" src="_00014-446255144.png" />
+
+                <img class="_00015-446255145" src="_00015-446255145.png" />
+
+                <img class="_00016-446255146" src="_00016-446255146.png" />
+            </div>
+
+            <div class="batch-4">
                 <div class="frame-31">
                     <img
                         class="_00005-3807344773"
@@ -1258,47 +214,7 @@
                 </div>
             </div>
 
-            <div class="frame-26">
-                <img class="_00011-3684755114" src="_00011-3684755114.png" />
-
-                <img class="_00002-3807344770" src="_00002-3807344770.png" />
-
-                <img class="_00006-1938722999" src="_00006-1938722999.png" />
-
-                <img class="_00008-1938723001" src="_00008-1938723001.png" />
-            </div>
-
-            <div class="frame-28">
-                <img class="_00011-3684755114" src="_00011-3684755114.png" />
-
-                <img class="_00002-3807344770" src="_00002-3807344770.png" />
-
-                <img class="_00006-1938722999" src="_00006-1938722999.png" />
-
-                <img class="_00008-1938723001" src="_00008-1938723001.png" />
-            </div>
-
-            <div class="frame-29">
-                <img class="_00011-3684755114" src="_00011-3684755114.png" />
-
-                <img class="_00002-3807344770" src="_00002-3807344770.png" />
-
-                <img class="_00006-1938722999" src="_00006-1938722999.png" />
-
-                <img class="_00008-1938723001" src="_00008-1938723001.png" />
-            </div>
-
-            <div class="frame-302">
-                <img class="_00011-3684755114" src="_00011-3684755114.png" />
-
-                <img class="_00002-3807344770" src="_00002-3807344770.png" />
-
-                <img class="_00006-1938722999" src="_00006-1938722999.png" />
-
-                <img class="_00008-1938723001" src="_00008-1938723001.png" />
-            </div>
-
-            <div class="frame-27">
+            <div class="batch-5">
                 <img class="_00001-1445990440" src="_00001-1445990440.png" />
 
                 <img class="_00010-3684755113" src="_00010-3684755113.png" />
@@ -1306,7 +222,7 @@
                 <img class="_00017-446255134" src="_00017-446255134.png" />
             </div>
 
-            <div class="frame-312">
+            <div class="batch-6">
                 <img class="_00011-3684755114" src="_00011-3684755114.png" />
 
                 <img class="_00002-3807344770" src="_00002-3807344770.png" />
@@ -1314,1756 +230,1341 @@
                 <img class="_00006-1938722999" src="_00006-1938722999.png" />
 
                 <img class="_00008-1938723001" src="_00008-1938723001.png" />
-            </div>
-
-            <div class="frame-322">
-                <img class="_00011-3684755114" src="_00011-3684755114.png" />
-
-                <img class="_00002-3807344770" src="_00002-3807344770.png" />
-
-                <img class="_00006-1938722999" src="_00006-1938722999.png" />
-
-                <img class="_00008-1938723001" src="_00008-1938723001.png" />
-            </div>
-
-            <div class="fade" />
-
-            <div class="scroll-bar2">
-                <div class="rectangle-82" />
-
-                <div class="rectangle-92" />
             </div>
         </div>
 
-        <div class="gro-e-ansicht">
-            <img src={result} alt="Prompt" />
+        <div class="scroll-bar">
+            <div class="rectangle-8" />
 
-            <!-- <img class="result" src="result.png" /> -->
+            <div class="rectangle-9" />
+        </div>
 
-            <div class="progress-bar">
-                <div class="image-4-100">Image 4: 100%</div>
+        <div class="history-title">
+            <div class="history-shadow" />
+
+            <div class="history-bg" />
+
+            <div class="history2">History</div>
+        </div>
+    </div>
+
+    <div class="result">
+        <div class="result-buttons">
+            <div class="button">
+                <div class="button2">Save Image</div>
             </div>
 
-            <div class="buttons2">
-                <div class="button6">
-                    <div class="button7">Save Image</div>
+            <svg
+                class="_16-px-arrow-left"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M6.7 12.3L2.9 8.5H15V7.5H2.9L6.7 3.7L6 3L1 8L6 13L6.7 12.3Z"
+                    fill="#195DE6"
+                />
+            </svg>
+
+            <svg
+                class="_16-px-arrow-right"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M9.3 3.7L13.1 7.5H1V8.5H13.1L9.3 12.3L10 13L15 8L10 3L9.3 3.7Z"
+                    fill="#195DE6"
+                />
+            </svg>
+
+            <div class="button-icon">
+                <svg
+                    class="_16-px-folder"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M5.585 3L7.295 4.705L7.585 5H14V13H2V3H5.585ZM5.585 2H2C1.73478 2 1.48043 2.10536 1.29289 2.29289C1.10536 2.48043 1 2.73478 1 3V13C1 13.2652 1.10536 13.5196 1.29289 13.7071C1.48043 13.8946 1.73478 14 2 14H14C14.2652 14 14.5196 13.8946 14.7071 13.7071C14.8946 13.5196 15 13.2652 15 13V5C15 4.73478 14.8946 4.48043 14.7071 4.29289C14.5196 4.10536 14.2652 4 14 4H8L6.295 2.295C6.20197 2.20142 6.09134 2.12717 5.96948 2.07654C5.84763 2.02591 5.71696 1.9999 5.585 2V2Z"
+                        fill="#195DE6"
+                    />
+                </svg>
+            </div>
+        </div>
+
+        <div class="result2">
+            <img class="_00013-3684755116-1" src={result} />
+        </div>
+
+        <div class="progress">
+            <div class="progress-bar">
+                <div class="rectangle-38" />
+
+                <div class="rectangle-39" />
+            </div>
+
+            <div class="progress-100">Progress: {percentage}%</div>
+
+            <div class="_0-00-min">{time} ETA</div>
+        </div>
+
+        <div class="result3">Result</div>
+    </div>
+
+    <div class="buttons">
+        <button class="button3" on:click={() => sendPrompt()}>
+            Generate
+        </button>
+
+        <div class="button4">
+            <div class="button5">Save Configuration</div>
+        </div>
+
+        <div class="button6">
+            <div class="button5">Open Configurations</div>
+        </div>
+    </div>
+
+    <div class="settings">
+        <div class="settings2">Settings</div>
+
+        <div class="resolution">
+            <div class="input-field">
+                <div class="input">512px</div>
+            </div>
+
+            <div class="input-field2">
+                <div class="input">512px</div>
+            </div>
+
+            <div class="width">Width</div>
+
+            <div class="hight">Hight</div>
+
+            <div class="resolution2">Resolution</div>
+        </div>
+
+        <div class="divider" />
+
+        <div class="model">
+            <div class="drop-down">
+                <div class="drop-down2">v1-5-pruned-ckpt</div>
+
+                <svg
+                    class="_8-px-caret-sort"
+                    width="8"
+                    height="8"
+                    viewBox="0 0 8 8"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z" fill="#47536B" />
+                </svg>
+            </div>
+
+            <div class="model2">Model</div>
+
+            <svg
+                class="_12-px-help"
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M6 0.75C3.075 0.75 0.75 3.075 0.75 6C0.75 8.925 3.075 11.25 6 11.25C8.925 11.25 11.25 8.925 11.25 6C11.25 3.075 8.925 0.75 6 0.75ZM6 10.5C3.525 10.5 1.5 8.475 1.5 6C1.5 3.525 3.525 1.5 6 1.5C8.475 1.5 10.5 3.525 10.5 6C10.5 8.475 8.475 10.5 6 10.5Z"
+                    fill="#47536B"
+                />
+                <path
+                    d="M6.00015 9.45C6.33152 9.45 6.60015 9.18137 6.60015 8.85C6.60015 8.51863 6.33152 8.25 6.00015 8.25C5.66878 8.25 5.40015 8.51863 5.40015 8.85C5.40015 9.18137 5.66878 9.45 6.00015 9.45Z"
+                    fill="#47536B"
+                />
+                <path
+                    d="M6.375 3H5.85C4.875 3 4.125 3.75 4.125 4.65V4.8H4.875V4.65C4.875 4.2 5.325 3.75 5.85 3.75H6.45C6.975 3.75 7.35 4.2 7.35 4.65C7.35 5.1 6.9 5.625 6.375 5.625H5.625V7.275H6.375V6.375C7.275 6.375 8.025 5.625 8.025 4.725C8.025 3.825 7.275 3 6.375 3Z"
+                    fill="#47536B"
+                />
+            </svg>
+        </div>
+
+        <div class="sampler">
+            <div class="drop-down">
+                <div class="drop-down2">Euler a</div>
+
+                <svg
+                    class="_8-px-caret-sort2"
+                    width="8"
+                    height="8"
+                    viewBox="0 0 8 8"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z" fill="#47536B" />
+                </svg>
+            </div>
+
+            <div class="sampler2">Sampler</div>
+
+            <svg
+                class="_12-px-help2"
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M6 0.75C3.075 0.75 0.75 3.075 0.75 6C0.75 8.925 3.075 11.25 6 11.25C8.925 11.25 11.25 8.925 11.25 6C11.25 3.075 8.925 0.75 6 0.75ZM6 10.5C3.525 10.5 1.5 8.475 1.5 6C1.5 3.525 3.525 1.5 6 1.5C8.475 1.5 10.5 3.525 10.5 6C10.5 8.475 8.475 10.5 6 10.5Z"
+                    fill="#47536B"
+                />
+                <path
+                    d="M6.00015 9.45C6.33152 9.45 6.60015 9.18137 6.60015 8.85C6.60015 8.51863 6.33152 8.25 6.00015 8.25C5.66878 8.25 5.40015 8.51863 5.40015 8.85C5.40015 9.18137 5.66878 9.45 6.00015 9.45Z"
+                    fill="#47536B"
+                />
+                <path
+                    d="M6.375 3H5.85C4.875 3 4.125 3.75 4.125 4.65V4.8H4.875V4.65C4.875 4.2 5.325 3.75 5.85 3.75H6.45C6.975 3.75 7.35 4.2 7.35 4.65C7.35 5.1 6.9 5.625 6.375 5.625H5.625V7.275H6.375V6.375C7.275 6.375 8.025 5.625 8.025 4.725C8.025 3.825 7.275 3 6.375 3Z"
+                    fill="#47536B"
+                />
+            </svg>
+        </div>
+
+        <div class="seed">
+            <div class="input-field3">
+                <div class="input2">random</div>
+            </div>
+
+            <div class="seed2">Seed</div>
+
+            <svg
+                class="_12-px-help3"
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M6 0.75C3.075 0.75 0.75 3.075 0.75 6C0.75 8.925 3.075 11.25 6 11.25C8.925 11.25 11.25 8.925 11.25 6C11.25 3.075 8.925 0.75 6 0.75ZM6 10.5C3.525 10.5 1.5 8.475 1.5 6C1.5 3.525 3.525 1.5 6 1.5C8.475 1.5 10.5 3.525 10.5 6C10.5 8.475 8.475 10.5 6 10.5Z"
+                    fill="#47536B"
+                />
+                <path
+                    d="M6.00015 9.45C6.33152 9.45 6.60015 9.18137 6.60015 8.85C6.60015 8.51863 6.33152 8.25 6.00015 8.25C5.66878 8.25 5.40015 8.51863 5.40015 8.85C5.40015 9.18137 5.66878 9.45 6.00015 9.45Z"
+                    fill="#47536B"
+                />
+                <path
+                    d="M6.375 3H5.85C4.875 3 4.125 3.75 4.125 4.65V4.8H4.875V4.65C4.875 4.2 5.325 3.75 5.85 3.75H6.45C6.975 3.75 7.35 4.2 7.35 4.65C7.35 5.1 6.9 5.625 6.375 5.625H5.625V7.275H6.375V6.375C7.275 6.375 8.025 5.625 8.025 4.725C8.025 3.825 7.275 3 6.375 3Z"
+                    fill="#47536B"
+                />
+            </svg>
+        </div>
+
+        <div class="guidance-scale">
+            <div class="guidance-scale2">Guidance Scale</div>
+
+            <div class="input-field4">
+                <div class="input">15</div>
+            </div>
+
+            <div class="slider">
+                <div class="rectangle-25" />
+
+                <div class="ellipse-12" />
+            </div>
+
+            <svg
+                class="_12-px-help4"
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M6 0.75C3.075 0.75 0.75 3.075 0.75 6C0.75 8.925 3.075 11.25 6 11.25C8.925 11.25 11.25 8.925 11.25 6C11.25 3.075 8.925 0.75 6 0.75ZM6 10.5C3.525 10.5 1.5 8.475 1.5 6C1.5 3.525 3.525 1.5 6 1.5C8.475 1.5 10.5 3.525 10.5 6C10.5 8.475 8.475 10.5 6 10.5Z"
+                    fill="#47536B"
+                />
+                <path
+                    d="M6.00015 9.45C6.33152 9.45 6.60015 9.18137 6.60015 8.85C6.60015 8.51863 6.33152 8.25 6.00015 8.25C5.66878 8.25 5.40015 8.51863 5.40015 8.85C5.40015 9.18137 5.66878 9.45 6.00015 9.45Z"
+                    fill="#47536B"
+                />
+                <path
+                    d="M6.375 3H5.85C4.875 3 4.125 3.75 4.125 4.65V4.8H4.875V4.65C4.875 4.2 5.325 3.75 5.85 3.75H6.45C6.975 3.75 7.35 4.2 7.35 4.65C7.35 5.1 6.9 5.625 6.375 5.625H5.625V7.275H6.375V6.375C7.275 6.375 8.025 5.625 8.025 4.725C8.025 3.825 7.275 3 6.375 3Z"
+                    fill="#47536B"
+                />
+            </svg>
+        </div>
+
+        <div class="steps">
+            <div class="steps2">Steps</div>
+
+            <div class="input-field4">
+                <div class="input">45</div>
+            </div>
+
+            <div class="slider">
+                <div class="rectangle-25" />
+
+                <div class="ellipse-12" />
+            </div>
+
+            <svg
+                class="_12-px-help5"
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M6 0.75C3.075 0.75 0.75 3.075 0.75 6C0.75 8.925 3.075 11.25 6 11.25C8.925 11.25 11.25 8.925 11.25 6C11.25 3.075 8.925 0.75 6 0.75ZM6 10.5C3.525 10.5 1.5 8.475 1.5 6C1.5 3.525 3.525 1.5 6 1.5C8.475 1.5 10.5 3.525 10.5 6C10.5 8.475 8.475 10.5 6 10.5Z"
+                    fill="#47536B"
+                />
+                <path
+                    d="M6.00015 9.45C6.33152 9.45 6.60015 9.18137 6.60015 8.85C6.60015 8.51863 6.33152 8.25 6.00015 8.25C5.66878 8.25 5.40015 8.51863 5.40015 8.85C5.40015 9.18137 5.66878 9.45 6.00015 9.45Z"
+                    fill="#47536B"
+                />
+                <path
+                    d="M6.375 3H5.85C4.875 3 4.125 3.75 4.125 4.65V4.8H4.875V4.65C4.875 4.2 5.325 3.75 5.85 3.75H6.45C6.975 3.75 7.35 4.2 7.35 4.65C7.35 5.1 6.9 5.625 6.375 5.625H5.625V7.275H6.375V6.375C7.275 6.375 8.025 5.625 8.025 4.725C8.025 3.825 7.275 3 6.375 3Z"
+                    fill="#47536B"
+                />
+            </svg>
+        </div>
+
+        <div class="batch">
+            <div class="input-field">
+                <div class="input">4</div>
+            </div>
+
+            <div class="input-field2">
+                <div class="input">1</div>
+            </div>
+
+            <div class="count">Count</div>
+
+            <div class="size">Size</div>
+
+            <div class="batch2">Batch</div>
+
+            <svg
+                class="_12-px-help6"
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M6 0.75C3.075 0.75 0.75 3.075 0.75 6C0.75 8.925 3.075 11.25 6 11.25C8.925 11.25 11.25 8.925 11.25 6C11.25 3.075 8.925 0.75 6 0.75ZM6 10.5C3.525 10.5 1.5 8.475 1.5 6C1.5 3.525 3.525 1.5 6 1.5C8.475 1.5 10.5 3.525 10.5 6C10.5 8.475 8.475 10.5 6 10.5Z"
+                    fill="#47536B"
+                />
+                <path
+                    d="M6.00015 9.45C6.33152 9.45 6.60015 9.18137 6.60015 8.85C6.60015 8.51863 6.33152 8.25 6.00015 8.25C5.66878 8.25 5.40015 8.51863 5.40015 8.85C5.40015 9.18137 5.66878 9.45 6.00015 9.45Z"
+                    fill="#47536B"
+                />
+                <path
+                    d="M6.375 3H5.85C4.875 3 4.125 3.75 4.125 4.65V4.8H4.875V4.65C4.875 4.2 5.325 3.75 5.85 3.75H6.45C6.975 3.75 7.35 4.2 7.35 4.65C7.35 5.1 6.9 5.625 6.375 5.625H5.625V7.275H6.375V6.375C7.275 6.375 8.025 5.625 8.025 4.725C8.025 3.825 7.275 3 6.375 3Z"
+                    fill="#47536B"
+                />
+            </svg>
+        </div>
+    </div>
+
+    <div class="prompt">
+        <div class="raw-prompt">
+            <svg
+                class="_16-px-chevron-down"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M8 4.99995L13 9.99995L12.3 10.7L8 6.39995L3.7 10.7L3 9.99995L8 4.99995Z"
+                    fill="#47536B"
+                />
+            </svg>
+
+            <div class="rawprompt-frame">
+                <div class="negative-prompt-text">
+                   {rawprompt}
+                </div>
+            </div>
+
+            <div class="raw-prompt2">Raw Prompt</div>
+        </div>
+
+        <div class="tags">
+            <div class="tag-frame">
+                <div class="tag">
+                    <div class="frame-19">
+                        <svg
+                            class="_8-px-close-filled"
+                            width="8"
+                            height="8"
+                            viewBox="0 0 8 8"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M4 0.5C2.05 0.5 0.5 2.05 0.5 4C0.5 5.95 2.05 7.5 4 7.5C5.95 7.5 7.5 5.95 7.5 4C7.5 2.05 5.95 0.5 4 0.5ZM5.35 5.75L4 4.4L2.65 5.75L2.25 5.35L3.6 4L2.25 2.65L2.65 2.25L4 3.6L5.35 2.25L5.75 2.65L4.4 4L5.75 5.35L5.35 5.75Z"
+                                fill="#FAFAFA"
+                            />
+                        </svg>
+
+                        <div class="tag2">Painting</div>
+                    </div>
+
+                    <div class="frame-20">
+                        <svg
+                            class="_8-px-subtract"
+                            width="8"
+                            height="8"
+                            viewBox="0 0 8 8"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
+                                fill="#FAFAFA"
+                            />
+                            <path d="M2 3.75H6V4.25H2V3.75Z" fill="#FAFAFA" />
+                        </svg>
+
+                        <div class="_1-0">1,0</div>
+
+                        <svg
+                            class="_8-px-add"
+                            width="8"
+                            height="8"
+                            viewBox="0 0 8 8"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
+                                fill="#FAFAFA"
+                            />
+                            <path
+                                d="M6 3.75H4.25V2H3.75V3.75H2V4.25H3.75V6H4.25V4.25H6V3.75Z"
+                                fill="#FAFAFA"
+                            />
+                        </svg>
+                    </div>
                 </div>
 
+                <div class="tag">
+                    <div class="frame-19">
+                        <svg
+                            class="_8-px-close-filled2"
+                            width="8"
+                            height="8"
+                            viewBox="0 0 8 8"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M4 0.5C2.05 0.5 0.5 2.05 0.5 4C0.5 5.95 2.05 7.5 4 7.5C5.95 7.5 7.5 5.95 7.5 4C7.5 2.05 5.95 0.5 4 0.5ZM5.35 5.75L4 4.4L2.65 5.75L2.25 5.35L3.6 4L2.25 2.65L2.65 2.25L4 3.6L5.35 2.25L5.75 2.65L4.4 4L5.75 5.35L5.35 5.75Z"
+                                fill="#FAFAFA"
+                            />
+                        </svg>
+
+                        <div class="tag2">Watercolor</div>
+                    </div>
+
+                    <div class="frame-20">
+                        <svg
+                            class="_8-px-subtract2"
+                            width="8"
+                            height="8"
+                            viewBox="0 0 8 8"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
+                                fill="#FAFAFA"
+                            />
+                            <path d="M2 3.75H6V4.25H2V3.75Z" fill="#FAFAFA" />
+                        </svg>
+
+                        <div class="_1-0">0,3</div>
+
+                        <svg
+                            class="_8-px-add2"
+                            width="8"
+                            height="8"
+                            viewBox="0 0 8 8"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
+                                fill="#FAFAFA"
+                            />
+                            <path
+                                d="M6 3.75H4.25V2H3.75V3.75H2V4.25H3.75V6H4.25V4.25H6V3.75Z"
+                                fill="#FAFAFA"
+                            />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="tag">
+                    <div class="frame-19">
+                        <svg
+                            class="_8-px-close-filled3"
+                            width="8"
+                            height="8"
+                            viewBox="0 0 8 8"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M4 0.5C2.05 0.5 0.5 2.05 0.5 4C0.5 5.95 2.05 7.5 4 7.5C5.95 7.5 7.5 5.95 7.5 4C7.5 2.05 5.95 0.5 4 0.5ZM5.35 5.75L4 4.4L2.65 5.75L2.25 5.35L3.6 4L2.25 2.65L2.65 2.25L4 3.6L5.35 2.25L5.75 2.65L4.4 4L5.75 5.35L5.35 5.75Z"
+                                fill="#FAFAFA"
+                            />
+                        </svg>
+
+                        <div class="tag2">Alla Prima</div>
+                    </div>
+
+                    <div class="frame-20">
+                        <svg
+                            class="_8-px-subtract3"
+                            width="8"
+                            height="8"
+                            viewBox="0 0 8 8"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
+                                fill="#FAFAFA"
+                            />
+                            <path d="M2 3.75H6V4.25H2V3.75Z" fill="#FAFAFA" />
+                        </svg>
+
+                        <div class="_1-0">1,2</div>
+
+                        <svg
+                            class="_8-px-add3"
+                            width="8"
+                            height="8"
+                            viewBox="0 0 8 8"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
+                                fill="#FAFAFA"
+                            />
+                            <path
+                                d="M6 3.75H4.25V2H3.75V3.75H2V4.25H3.75V6H4.25V4.25H6V3.75Z"
+                                fill="#FAFAFA"
+                            />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tags2">Tags</div>
+        </div>
+
+        <div class="negative-content">
+            <div class="negative-content-frame">
+                <div class="negative-prompt-text2">
+                    What should not be on the image?
+                </div>
+            </div>
+
+            <div class="negative-content2">Negative Content</div>
+        </div>
+
+        <div class="content">
+            <div class="content2">Content</div>
+
+            <input
+                bind:value={userprompt}
+                on:keydown={onKeyDown}
+                class="content-frame"
+            />
+
+            <!-- <div class="content-frame">
+                <div class="prompt-text">What should be on the image?</div>
+            </div> -->
+        </div>
+
+        <div class="prompt2">Prompt</div>
+    </div>
+
+    <div class="tags3">
+        <div class="styles">
+            <div class="styles2">Styles</div>
+
+            <div class="optional">optional</div>
+
+            <div class="drop-down3">
+                <div class="drop-down2">most relevant</div>
+
                 <svg
-                    class="_16-px-arrow-left"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
+                    class="_8-px-caret-sort3"
+                    width="8"
+                    height="8"
+                    viewBox="0 0 8 8"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                 >
-                    <path
-                        d="M6.7 12.3L2.9 8.5H15V7.5H2.9L6.7 3.7L6 3L1 8L6 13L6.7 12.3Z"
-                        fill="#195DE6"
-                    />
+                    <path d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z" fill="#47536B" />
                 </svg>
+            </div>
 
-                <svg
-                    class="_16-px-arrow-right"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M9.3 3.7L13.1 7.5H1V8.5H13.1L9.3 12.3L10 13L15 8L10 3L9.3 3.7Z"
-                        fill="#195DE6"
-                    />
-                </svg>
+            <div class="frame-18">
+                <div class="chip">
+                    <div class="chip2">Effects</div>
+                </div>
 
-                <div class="button-icon">
+                <div class="chip">
+                    <div class="chip2">Materials</div>
+                </div>
+
+                <div class="chip">
+                    <div class="chip2">Concepts</div>
+                </div>
+
+                <div class="chip3">
+                    <div class="chip4">Movements</div>
+                </div>
+
+                <div class="chip">
+                    <div class="chip2">Other</div>
+                </div>
+            </div>
+
+            <div class="divider2" />
+
+            <div class="styles-kacheln">
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
                     <svg
-                        class="_16-px-folder"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
+                        class="_10-px-checkbox"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                     >
                         <path
-                            d="M5.585 3L7.295 4.705L7.585 5H14V13H2V3H5.585ZM5.585 2H2C1.73478 2 1.48043 2.10536 1.29289 2.29289C1.10536 2.48043 1 2.73478 1 3V13C1 13.2652 1.10536 13.5196 1.29289 13.7071C1.48043 13.8946 1.73478 14 2 14H14C14.2652 14 14.5196 13.8946 14.7071 13.7071C14.8946 13.5196 15 13.2652 15 13V5C15 4.73478 14.8946 4.48043 14.7071 4.29289C14.5196 4.10536 14.2652 4 14 4H8L6.295 2.295C6.20197 2.20142 6.09134 2.12717 5.96948 2.07654C5.84763 2.02591 5.71696 1.9999 5.585 2V2Z"
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
                             fill="#195DE6"
                         />
                     </svg>
+
+                    <div class="photography">Cubism</div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox2"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Surrealism</div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox3"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Renaissance</div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox4"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Pop Art</div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-7" src="rectangle-7.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox5"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Descriptions</div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-7" src="rectangle-7.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox6"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Descriptions</div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-7" src="rectangle-7.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox7"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Descriptions</div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-7" src="rectangle-7.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox8"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Descriptions</div>
                 </div>
             </div>
+        </div>
+
+        <div class="techniques">
+            <div class="techniques2">Techniques</div>
+
+            <div class="optional2">optional</div>
+
+            <div class="drop-down3">
+                <div class="drop-down2">most relevant</div>
+
+                <svg
+                    class="_8-px-caret-sort4"
+                    width="8"
+                    height="8"
+                    viewBox="0 0 8 8"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z" fill="#47536B" />
+                </svg>
+            </div>
+
+            <div class="techniques-tabs">
+                <div class="chip">
+                    <div class="chip2">Photography</div>
+                </div>
+
+                <div class="chip">
+                    <div class="chip2">Rendering</div>
+                </div>
+
+                <div class="chip3">
+                    <div class="chip4">Painting</div>
+                </div>
+
+                <div class="chip">
+                    <div class="chip2">Drawing</div>
+                </div>
+
+                <div class="chip">
+                    <div class="chip2">Graphic</div>
+                </div>
+
+                <div class="chip">
+                    <div class="chip2">Print</div>
+                </div>
+
+                <div class="chip">
+                    <div class="chip2">Digital Art</div>
+                </div>
+
+                <div class="chip">
+                    <div class="chip2">Other</div>
+                </div>
+            </div>
+
+            <div class="show-more">
+                <svg
+                    class="_10-px-chevron-down"
+                    width="10"
+                    height="10"
+                    viewBox="0 0 10 10"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M5 6.875L1.875 3.75L2.3125 3.3125L5 6L7.6875 3.3125L8.125 3.75L5 6.875Z"
+                        fill="#195DE6"
+                    />
+                </svg>
+
+                <div class="show-more2">show more</div>
+            </div>
+
+            <div class="divider3" />
+
+            <div class="techniques-kacheln">
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox9"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Oil</div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox10"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Ink</div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox11"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Brush</div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-72" src="rectangle-72.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox12"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Graffiti</div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="airbrush" src="airbrush.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox13"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Gouache</div>
+                </div>
+
+                <div class="kachel2">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <div class="text">
+                        <svg
+                            class="_10-px-checkbox-checked-filled"
+                            width="10"
+                            height="10"
+                            viewBox="0 0 10 10"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.12503 1.25H1.87503C1.70927 1.25 1.5503 1.31585 1.43309 1.43306C1.31588 1.55027 1.25003 1.70924 1.25003 1.875V8.125C1.25003 8.29076 1.31588 8.44973 1.43309 8.56694C1.5503 8.68415 1.70927 8.75 1.87503 8.75H8.12503C8.29079 8.75 8.44976 8.68415 8.56697 8.56694C8.68418 8.44973 8.75003 8.29076 8.75003 8.125V1.875C8.75003 1.70924 8.68418 1.55027 8.56697 1.43306C8.44976 1.31585 8.29079 1.25 8.12503 1.25V1.25ZM4.37503 6.71875L2.81253 5.16959L3.30966 4.6875L4.37503 5.733L6.69025 3.4375L7.18769 3.93037L4.37503 6.71875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
+
+                        <div class="photography2">Watercolor</div>
+                    </div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="gouache" src="gouache.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox14"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Airbrush</div>
+                </div>
+
+                <div class="kachel2">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <div class="text">
+                        <svg
+                            class="_10-px-checkbox-checked-filled2"
+                            width="10"
+                            height="10"
+                            viewBox="0 0 10 10"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.12503 1.25H1.87503C1.70927 1.25 1.5503 1.31585 1.43309 1.43306C1.31588 1.55027 1.25003 1.70924 1.25003 1.875V8.125C1.25003 8.29076 1.31588 8.44973 1.43309 8.56694C1.5503 8.68415 1.70927 8.75 1.87503 8.75H8.12503C8.29079 8.75 8.44976 8.68415 8.56697 8.56694C8.68418 8.44973 8.75003 8.29076 8.75003 8.125V1.875C8.75003 1.70924 8.68418 1.55027 8.56697 1.43306C8.44976 1.31585 8.29079 1.25 8.12503 1.25V1.25ZM4.37503 6.71875L2.81253 5.16959L3.30966 4.6875L4.37503 5.733L6.69025 3.4375L7.18769 3.93037L4.37503 6.71875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
+
+                        <div class="photography2">Alla Prima</div>
+                    </div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox15"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Pointilism</div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox16"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Impasto</div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-72" src="rectangle-72.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox17"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Stippling</div>
+                </div>
+
+                <div class="kachel">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <svg
+                        class="_10-px-checkbox18"
+                        width="10"
+                        height="11"
+                        viewBox="0 0 10 11"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="photography">Chiaroscuro</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="medium">
+            <div class="medium2">Medium</div>
+
+            <div class="mediumkacheln">
+                <button class="kachel3" on:click={() => medium = "A photograph of "}>
+                    <div class="vorschau">
+                        <img class="rectangle-7" src="rectangle-7.png" />
+                    </div>
+
+                    <div class="photography3">Photography</div>
+                </button>
+
+                <div class="kachel4">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <div class="photography3">Graphic</div>
+                </div>
+
+                <div class="kachel5">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <div class="photography3">Rendering</div>
+                </div>
+
+                <div class="kachel6">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <div class="photography3">Print</div>
+                </div>
+
+                <div class="kachel7">
+                    <div class="vorschau">
+                        <img class="rectangle-72" src="rectangle-72.png" />
+                    </div>
+
+                    <div class="photography4">Painting</div>
+                </div>
+
+                <div class="kachel8">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <div class="photography3">Digital Art</div>
+                </div>
+
+                <div class="kachel9">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <div class="photography3">Drawing</div>
+                </div>
+            </div>
+
+            <div class="kachel10">
+                <div class="vorschau">
+                    <img class="rectangle-73" src="rectangle-73.png" />
+                </div>
+
+                <div class="new-idea">New Idea</div>
+
+                <svg
+                    class="_32-px-add-filled"
+                    width="32"
+                    height="32"
+                    viewBox="0 0 32 32"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M16 2C12.3009 2.04476 8.76586 3.53412 6.14999 6.14999C3.53412 8.76586 2.04476 12.3009 2 16C2.04476 19.6991 3.53412 23.2341 6.14999 25.85C8.76586 28.4659 12.3009 29.9552 16 30C19.6991 29.9552 23.2341 28.4659 25.85 25.85C28.4659 23.2341 29.9552 19.6991 30 16C29.9552 12.3009 28.4659 8.76586 25.85 6.14999C23.2341 3.53412 19.6991 2.04476 16 2V2ZM24 17H17V24H15V17H8V15H15V8H17V15H24V17Z"
+                        fill="#FAFAFA"
+                    />
+                </svg>
+            </div>
+
+            <div class="medium-devider" />
+        </div>
+
+        <div class="fade" />
+
+        <div class="scroll-bar2">
+            <div class="rectangle-83" />
+
+            <div class="rectangle-92" />
+        </div>
+
+        <div class="search">
+            <div class="search2">search...</div>
+
+            <svg
+                class="_8-px-search"
+                width="10"
+                height="10"
+                viewBox="0 0 10 10"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M9.37501 8.93751L6.68751 6.25001C7.87501 4.81251 7.68751 2.62501 6.25001 1.43751C4.81251 0.250009 2.62501 0.437509 1.43751 1.87501C0.250009 3.31251 0.437509 5.50001 1.87501 6.68751C3.12501 7.75001 5.00001 7.75001 6.25001 6.68751L8.93751 9.37501L9.37501 8.93751ZM1.25001 4.06251C1.25001 2.50001 2.50001 1.25001 4.06251 1.25001C5.62501 1.25001 6.87501 2.50001 6.87501 4.06251C6.87501 5.62501 5.62501 6.87501 4.06251 6.87501C2.50001 6.87501 1.25001 5.62501 1.25001 4.06251Z"
+                    fill="#47536B"
+                />
+            </svg>
+        </div>
+
+        <div class="tags4">Tags</div>
+    </div>
+
+    <div class="top-bar">
+        <div class="green-ellipse" />
+
+        <div class="yellow-ellipse" />
+
+        <div class="red-ellipse" />
+
+        <div class="projects">
+            <span
+                ><span class="projects-span">Projects / </span><span
+                    class="projects-span2">Untitled Project</span
+                ></span
+            >
         </div>
     </div>
 </div>
 
 <style>
-    Copy .Mainframe,
-    .Mainframe * {
+    .main,
+    .main * {
         box-sizing: border-box;
     }
-    .Mainframe {
+
+    .main {
         background: var(--bluebackground, #edeef3);
+        border-radius: 12px;
         width: 1920px;
         height: 1080px;
         position: relative;
         overflow: hidden;
     }
-    .style {
+
+    .history {
         background: var(--white, #fafafa);
         border-radius: 12px;
-        width: 757px;
-        height: 1005px;
+        width: 407px;
+        height: 996px;
         position: absolute;
-        left: 22px;
-        top: 44px;
+        left: 1493px;
+        top: 64px;
         box-shadow: var(
-            --shadow-section-box-shadow,
-            0px 7px 14px 0px rgba(31, 37, 71, 0.25)
+            --shadow-section-2-box-shadow,
+            0px 4px 10px 0px rgba(31, 37, 71, 0.15)
         );
         overflow: hidden;
     }
-    .tags {
-        width: 392px;
-        height: 1150px;
-        position: absolute;
-        left: 0px;
-        top: 20px;
-    }
-    .tags2 {
-        color: var(--blue-heading, #1f4ead);
-        text-align: left;
-        font: var(--h-1, 500 24px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 20px;
-        top: 0px;
-    }
-    .scroll-bar {
-        width: 7px;
-        height: 898px;
-        position: absolute;
-        left: 385px;
-        top: 51px;
-    }
-    .rectangle-8 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 100px;
-        width: 7px;
-        height: 898px;
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    .rectangle-9 {
-        background: var(--bluemid, #94a0b8);
-        border-radius: 100px;
-        width: 7px;
-        height: 298.67px;
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    .medium {
-        width: 350px;
-        height: 223px;
-        position: absolute;
-        left: 20px;
-        top: 51px;
-    }
-    .medium2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    .kacheln {
-        width: 350px;
-        height: 170px;
-        position: absolute;
-        left: 0px;
-        top: 31px;
-    }
-    .kachel {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 0px;
-        top: 0px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    .photography {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 4px;
-        top: 60px;
-        width: 71px;
-        height: 16px;
-    }
-    .rectangle-7 {
-        border-radius: 2px;
-        width: 70px;
-        height: 52px;
-        position: absolute;
-        left: 5px;
-        top: 5px;
-    }
-    .kachel2 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 0px;
-        top: 90px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    .kachel3 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 90px;
-        top: 0px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    .kachel4 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 90px;
-        top: 90px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    .kachel5 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        border-style: solid;
-        border-color: var(--blueaccent, #195de5);
-        border-width: 1px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 180px;
-        top: 0px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    .photography2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 5px;
-        top: 60px;
-        width: 70px;
-        height: 15px;
-    }
-    .kachel6 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 180px;
-        top: 90px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    .kachel7 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 270px;
-        top: 0px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    .kachel8 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 270px;
-        top: 121px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    .new-idea {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 5px;
-        top: 60px;
-        width: 70px;
-        height: 15px;
-    }
-    .frame-1 {
-        border-radius: 2px;
-        width: 70px;
-        height: 52px;
-        position: absolute;
-        left: 5px;
-        top: 5px;
-        overflow: hidden;
-    }
-    .rectangle-72 {
-        border-radius: 2px;
-        width: 70px;
-        height: 52px;
-        position: absolute;
-        left: 0px;
-        top: 0px;
-        filter: blur(2px);
-    }
-    ._32-px-add-filled {
-        position: absolute;
-        left: 23px;
-        top: 15px;
-        overflow: visible;
-    }
-    .divider {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 2px;
-        width: 350px;
-        height: 2px;
-        position: absolute;
-        left: 0px;
-        top: 221px;
-    }
-    .techniques {
-        width: 350px;
-        height: 417px;
-        position: absolute;
-        left: 20px;
-        top: 294px;
-    }
-    .techniques2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    .optional {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: 300 16px "IBM Plex Sans", sans-serif;
-        position: absolute;
-        left: 89px;
-        top: 0px;
-    }
-    .drop-down {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 3px;
-        border-style: solid;
-        border-color: var(--bluemid, #94a0b8);
-        border-width: 1px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        width: 100px;
-        position: absolute;
-        left: 250px;
-        top: 3px;
-    }
-    .drop-down2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    ._8-px-caret-sort {
-        flex-shrink: 0;
-        position: relative;
-        overflow: visible;
-    }
-    .frame-18 {
-        width: 339px;
-        height: 50px;
-        position: absolute;
-        left: 0px;
-        top: 40px;
-    }
-    .chip {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 3px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: center;
-        justify-content: flex-start;
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    .chip2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    .chip3 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 3px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: center;
-        justify-content: flex-start;
-        position: absolute;
-        left: 85px;
-        top: 0px;
-    }
-    .chip4 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 3px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: center;
-        justify-content: flex-start;
-        position: absolute;
-        left: 221px;
-        top: 0px;
-    }
-    .chip5 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 3px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: center;
-        justify-content: flex-start;
-        position: absolute;
-        left: 284px;
-        top: 0px;
-    }
-    .chip6 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 3px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: center;
-        justify-content: flex-start;
-        position: absolute;
-        left: 0px;
-        top: 28px;
-    }
-    .chip7 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 3px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: center;
-        justify-content: flex-start;
-        position: absolute;
-        left: 46px;
-        top: 28px;
-    }
-    .chip8 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 3px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: center;
-        justify-content: flex-start;
-        position: absolute;
-        left: 118px;
-        top: 28px;
-    }
-    .chip9 {
-        background: var(--bluemid, #94a0b8);
-        border-radius: 3px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: center;
-        justify-content: flex-start;
-        position: absolute;
-        left: 158px;
-        top: 0px;
-    }
-    .chip10 {
-        color: var(--white, #fafafa);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    .show-more {
-        display: flex;
-        flex-direction: row;
-        gap: 1px;
-        align-items: center;
-        justify-content: flex-start;
-        width: 66px;
-        height: 14px;
-        position: absolute;
-        left: 0px;
-        top: 385px;
-    }
-    ._10-px-chevron-down {
-        flex-shrink: 0;
-        position: relative;
-        overflow: visible;
-    }
-    .show-more2 {
-        color: var(--blueaccent, #195de5);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: relative;
-    }
-    .divider2 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 2px;
-        width: 350px;
-        height: 2px;
-        position: absolute;
-        left: 0px;
-        top: 415px;
-    }
-    .kacheln2 {
-        width: 350px;
-        height: 260px;
-        position: absolute;
-        left: 0px;
-        top: 105px;
-    }
-    .photography3 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 17px;
-        top: 60px;
-        width: 58px;
-        height: 15px;
-    }
-    ._8-px-checkbox {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    ._8-px-checkbox2 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    .kachel9 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 0px;
-        top: 180px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    ._8-px-checkbox3 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    ._8-px-checkbox4 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    .kachel10 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        border-style: solid;
-        border-color: var(--blueaccent, #195de5);
-        border-width: 1px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 90px;
-        top: 90px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    .photography4 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 16px;
-        top: 60px;
-        width: 59px;
-        height: 15px;
-    }
-    ._8-px-checkbox-checked-filled {
-        position: absolute;
-        left: 4px;
-        top: 62px;
-        overflow: visible;
-    }
-    .kachel11 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 90px;
-        top: 180px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    ._8-px-checkbox5 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    .kachel12 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 180px;
-        top: 0px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    ._8-px-checkbox6 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    ._8-px-checkbox7 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    .kachel13 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 180px;
-        top: 180px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    ._8-px-checkbox8 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    ._8-px-checkbox9 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    .kachel14 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        border-style: solid;
-        border-color: var(--blueaccent, #195de5);
-        border-width: 1px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 270px;
-        top: 90px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    ._8-px-checkbox-checked-filled2 {
-        position: absolute;
-        left: 4px;
-        top: 62px;
-        overflow: visible;
-    }
-    .kachel15 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 270px;
-        top: 180px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    ._8-px-checkbox10 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    .styles {
-        width: 350px;
-        height: 419px;
-        position: absolute;
-        left: 20px;
-        top: 731px;
-    }
-    .styles2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    .optional2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: 300 16px "IBM Plex Sans", sans-serif;
-        position: absolute;
-        left: 50px;
-        top: 0px;
-    }
-    ._8-px-caret-sort2 {
-        flex-shrink: 0;
-        position: relative;
-        overflow: visible;
-    }
-    .style-tabs {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-        justify-content: space-between;
-        position: absolute;
-        left: 0px;
-        top: 40px;
-    }
-    .chip11 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 3px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: center;
-        justify-content: flex-start;
-        flex-shrink: 0;
-        position: relative;
-    }
-    .chip12 {
-        background: var(--bluemid, #94a0b8);
-        border-radius: 3px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: center;
-        justify-content: flex-start;
-        flex-shrink: 0;
-        position: relative;
-    }
-    .divider3 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 2px;
-        width: 350px;
-        height: 2px;
-        position: absolute;
-        left: 0px;
-        top: 417px;
-    }
-    .kacheln3 {
-        width: 350px;
-        height: 170px;
-        position: absolute;
-        left: 0px;
-        top: 78px;
-    }
-    ._8-px-checkbox11 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    ._8-px-checkbox12 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    ._8-px-checkbox13 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    ._8-px-checkbox14 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    ._8-px-checkbox15 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    ._8-px-checkbox16 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    ._8-px-checkbox17 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    .kachel16 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 270px;
-        top: 90px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    ._8-px-checkbox18 {
-        position: absolute;
-        left: 5px;
-        top: 62px;
-        overflow: visible;
-    }
-    .rectangle-23 {
-        background: var(
-            --fade,
-            linear-gradient(
-                180deg,
-                rgba(250, 250, 250, 0) 0%,
-                rgba(250, 250, 250, 1) 89.58333134651184%
-            )
-        );
-        width: 385px;
-        height: 90px;
-        position: absolute;
-        left: 0px;
-        top: 894px;
-    }
-    .prompt {
-        width: 290px;
-        height: 491px;
-        position: absolute;
-        left: 448px;
-        top: 20px;
-    }
-    .prompt2 {
-        color: var(--blue-heading, #1f4ead);
-        text-align: left;
-        font: var(--h-1, 500 24px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    .negative-content {
-        width: 290px;
-        height: 97px;
-        position: absolute;
-        left: 0px;
-        top: 158px;
-    }
-    .negative-content2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    .rectangle-25 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        border-style: solid;
-        border-color: var(--bluemid, #94a0b8);
-        border-width: 1px;
-        width: 290px;
-        height: 66px;
-        position: absolute;
-        left: 0px;
-        top: 31px;
-    }
-    .what-shouldn-t-be-on-the-image {
-        color: var(--bluemid, #94a0b8);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 8px;
-        top: 39px;
-        width: 274px;
-        height: 34px;
-    }
-    .content {
-        width: 290px;
-        height: 97px;
-        position: absolute;
-        left: 0px;
-        top: 51px;
-    }
-    .content2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    .rectangle-24 {
-        background: var(--bluebackground, #edeef3);
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        border-radius: 6px;
-        border-style: solid;
-        border-color: var(--bluemid, #94a0b8);
-        border-width: 1px;
-        width: 290px;
-        height: 66px;
-        position: absolute;
-        left: 0px;
-        top: 31px;
-        display: block;
-    }
-    .a-mouse-chasing-a-cat {
-        color: var(--bluetext, #47536b);
-        background: var(--bluebackground, #edeef3);
-        text-align: left;
-        text-indent: 1em;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        border-radius: 6px;
-        border-style: solid;
-        border-color: var(--bluemid, #94a0b8);
-        border-width: 1px;
-        width: 290px;
-        height: 66px;
-        position: absolute;
-        display: block;
-        /* left: 8px;*/
-        top: 31px;
-        /* width: 274px;
-        height: 34px; */
-    }
-    .raw-prompt {
-        width: 290px;
-        height: 97px;
-        position: absolute;
-        left: 0px;
-        top: 372px;
-    }
-    .raw-prompt2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    .a-painting-of-a-mouse-chasing-a-cat-painted-with-watercolors-0-3-in-alla-prima-1-2-style {
-        text-align: left;
-        font: var(--text-mono, 400 11px "IBM Plex Mono", sans-serif);
-        position: absolute;
-        left: 8px;
-        top: 39px;
-        width: 274px;
-        height: 34px;
-    }
-    .a-painting-of-a-mouse-chasing-a-cat-painted-with-watercolors-0-3-in-alla-prima-1-2-style-span {
-        color: var(--blueaccent, #195de5);
-        font: var(--text-mono, 400 11px "IBM Plex Mono", sans-serif);
-    }
-    .a-painting-of-a-mouse-chasing-a-cat-painted-with-watercolors-0-3-in-alla-prima-1-2-style-span2 {
-        color: var(--bluetext, #47536b);
-        font: var(--text-mono, 400 11px "IBM Plex Mono", sans-serif);
-    }
-    .a-painting-of-a-mouse-chasing-a-cat-painted-with-watercolors-0-3-in-alla-prima-1-2-style-span3 {
-        color: var(--blueaccent, #195de5);
-        font: var(--text-mono, 400 11px "IBM Plex Mono", sans-serif);
-    }
-    ._16-px-chevron-down {
-        position: absolute;
-        left: 290px;
-        top: 20px;
-        transform: translate(-16px, -16px);
-        overflow: visible;
-    }
-    .tags3 {
+
+    .batches {
+        padding: 13px 0px 13px 0px;
         display: flex;
         flex-direction: column;
-        gap: 10px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        width: 290px;
-        position: absolute;
-        left: 0px;
-        top: 265px;
-    }
-    .tags4 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
-        position: relative;
-        align-self: stretch;
-    }
-    .frame-19 {
-        background: #edeef3;
-        border-radius: 6px;
-        align-self: stretch;
-        flex-shrink: 0;
-        height: 66px;
-        position: relative;
-    }
-    .tag {
-        background: var(--blueaccent, #195de5);
-        border-radius: 3px;
-        padding: 4px 6px 4px 6px;
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: center;
-        justify-content: flex-start;
-        position: absolute;
-        left: 8px;
-        top: 8px;
-    }
-    .frame-192 {
-        display: flex;
-        flex-direction: row;
-        gap: 4px;
-        align-items: center;
-        justify-content: flex-start;
-        flex-shrink: 0;
-        position: relative;
-    }
-    ._8-px-close-filled {
-        flex-shrink: 0;
-        position: relative;
-        overflow: visible;
-    }
-    .tag2 {
-        color: var(--white, #fafafa);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    .frame-20 {
-        display: flex;
-        flex-direction: row;
-        gap: 2px;
-        align-items: center;
-        justify-content: flex-start;
-        flex-shrink: 0;
-        position: relative;
-    }
-    ._8-px-subtract {
-        flex-shrink: 0;
-        position: relative;
-        overflow: visible;
-    }
-    ._1-0 {
-        color: var(--white, #fafafa);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    ._8-px-add {
-        flex-shrink: 0;
-        position: relative;
-        overflow: visible;
-    }
-    .tag3 {
-        background: var(--blueaccent, #195de5);
-        border-radius: 3px;
-        padding: 4px 6px 4px 6px;
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: center;
-        justify-content: flex-start;
-        position: absolute;
-        left: 122px;
-        top: 8px;
-    }
-    ._8-px-close-filled2 {
-        flex-shrink: 0;
-        position: relative;
-        overflow: visible;
-    }
-    ._8-px-subtract2 {
-        flex-shrink: 0;
-        position: relative;
-        overflow: visible;
-    }
-    ._8-px-add2 {
-        flex-shrink: 0;
-        position: relative;
-        overflow: visible;
-    }
-    .tag4 {
-        background: var(--blueaccent, #195de5);
-        border-radius: 3px;
-        padding: 4px 6px 4px 6px;
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: center;
-        justify-content: flex-start;
-        position: absolute;
-        left: 8px;
-        top: 36px;
-    }
-    ._8-px-close-filled3 {
-        flex-shrink: 0;
-        position: relative;
-        overflow: visible;
-    }
-    ._8-px-subtract3 {
-        flex-shrink: 0;
-        position: relative;
-        overflow: visible;
-    }
-    ._8-px-add3 {
-        flex-shrink: 0;
-        position: relative;
-        overflow: visible;
-    }
-    .divider4 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 2px;
-        width: 290px;
-        height: 2px;
-        position: absolute;
-        left: 0px;
-        top: 489px;
-    }
-    .settings {
-        width: 290px;
-        height: 364px;
-        position: absolute;
-        left: 448px;
-        top: 531px;
-    }
-    .settings2 {
-        color: var(--blue-heading, #1f4ead);
-        text-align: left;
-        font: var(--h-1, 500 24px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    .resolution {
-        width: 126px;
-        height: 72px;
-        position: absolute;
-        left: 0px;
-        top: 270px;
-    }
-    .input-field {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 3px;
-        border-style: solid;
-        border-color: var(--bluemid, #94a0b8);
-        border-width: 1px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        width: 90px;
-        position: absolute;
-        left: 0px;
-        top: 22px;
-    }
-    .input {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    .input-field2 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 3px;
-        border-style: solid;
-        border-color: var(--bluemid, #94a0b8);
-        border-width: 1px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        width: 90px;
-        position: absolute;
-        left: 0px;
-        top: 50px;
-    }
-    .width {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 96px;
-        top: 26px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    .hight {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 96px;
-        top: 54px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    .resolution2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    .divider5 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 2px;
-        width: 290px;
-        height: 2px;
-        position: absolute;
-        left: 0px;
-        top: 248px;
-    }
-    .model {
-        width: 135px;
-        height: 44px;
-        position: absolute;
-        left: 0px;
-        top: 56px;
-    }
-    .drop-down3 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 3px;
-        border-style: solid;
-        border-color: var(--bluemid, #94a0b8);
-        border-width: 1px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        width: 135px;
-        position: absolute;
-        left: 0px;
-        top: 22px;
-    }
-    ._8-px-caret-sort3 {
-        flex-shrink: 0;
-        position: relative;
-        overflow: visible;
-    }
-    .model2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    ._12-px-help {
-        position: absolute;
-        left: 117px;
-        top: 1px;
-        overflow: visible;
-    }
-    .sampler {
-        width: 135px;
-        height: 44px;
-        position: absolute;
-        left: 155px;
-        top: 56px;
-    }
-    ._8-px-caret-sort4 {
-        flex-shrink: 0;
-        position: relative;
-        overflow: visible;
-    }
-    .sampler2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    ._12-px-help2 {
-        position: absolute;
-        left: 117px;
-        top: 1px;
-        overflow: visible;
-    }
-    .seed {
-        width: 135px;
-        height: 44px;
-        position: absolute;
-        left: 0px;
-        top: 184px;
-    }
-    .input-field3 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 3px;
-        border-style: solid;
-        border-color: var(--bluemid, #94a0b8);
-        border-width: 1px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        width: 135px;
-        position: absolute;
-        left: 0px;
-        top: 22px;
-    }
-    .input2 {
-        color: var(--bluemid, #94a0b8);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    .seed2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    ._12-px-help3 {
-        position: absolute;
-        left: 117px;
-        top: 1px;
-        overflow: visible;
-    }
-    .guidance {
-        width: 135px;
-        height: 44px;
-        position: absolute;
-        left: 0px;
-        top: 120px;
-    }
-    .guidance-scale {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    .input-field4 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 3px;
-        border-style: solid;
-        border-color: var(--bluemid, #94a0b8);
-        border-width: 1px;
-        padding: 4px 8px 4px 8px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        width: 29px;
-        position: absolute;
-        left: 106px;
-        top: 22px;
-    }
-    .slider {
-        width: 100px;
-        height: 8px;
-        position: absolute;
-        left: 0px;
-        top: 27px;
-    }
-    .rectangle-252 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 2px;
-        width: 100px;
-        height: 4px;
-        position: absolute;
-        left: 0px;
-        top: 2px;
-    }
-    .ellipse-12 {
-        background: var(--bluemid, #94a0b8);
-        border-radius: 50%;
-        width: 8px;
-        height: 8px;
-        position: absolute;
-        left: calc(50% - 6px);
-        top: calc(50% - 4px);
-    }
-    ._12-px-help4 {
-        position: absolute;
-        left: 117px;
-        top: 1px;
-        overflow: visible;
-    }
-    .steps {
-        width: 135px;
-        height: 44px;
-        position: absolute;
-        left: 155px;
-        top: 120px;
-    }
-    .steps2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    ._12-px-help5 {
-        position: absolute;
-        left: 117px;
-        top: 1px;
-        overflow: visible;
-    }
-    .batch {
-        width: 129px;
-        height: 72px;
-        position: absolute;
-        left: 155px;
-        top: 270px;
-    }
-    .count {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 96px;
-        top: 26px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    .size {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 96px;
-        top: 54px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    .batch2 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-    ._12-px-help6 {
-        position: absolute;
-        left: 117px;
-        top: 1px;
-        overflow: visible;
-    }
-    .divider6 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 2px;
-        width: 290px;
-        height: 2px;
-        position: absolute;
-        left: 0px;
-        top: 362px;
-    }
-    .buttons {
-        width: 290px;
-        height: 70px;
-        position: absolute;
-        left: 448px;
-        top: 915px;
-    }
-    .button {
-        background: var(--blueaccent, #195de5);
-        border-radius: 4px;
-        padding: 8px 12px 8px 12px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: flex-start;
-        justify-content: center;
-        width: 290px;
-        position: absolute;
-        left: 0px;
-        top: 40px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-    }
-    .button2 {
-        color: var(--white, #fafafa);
-        text-align: center;
-        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
-        position: relative;
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .button3 {
-        background: var(--blueaccent-light, #d1dffa);
-        border-radius: 4px;
-        padding: 8px 12px 8px 12px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: flex-start;
-        justify-content: center;
-        width: 140px;
-        position: absolute;
-        left: 0px;
-        top: 0px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-    }
-    .button4 {
-        color: var(--blueaccent, #195de5);
-        text-align: left;
-        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    .button5 {
-        background: var(--blueaccent-light, #d1dffa);
-        border-radius: 4px;
-        padding: 8px 12px 8px 12px;
-        display: flex;
-        flex-direction: row;
-        gap: 0px;
-        align-items: flex-start;
-        justify-content: center;
-        width: 140px;
-        position: absolute;
-        left: 150px;
-        top: 0px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-    }
-    .top-bar {
-        background: var(--white, #fafafa);
-        width: 1920px;
-        height: 24px;
-        position: absolute;
-        left: 0px;
-        top: 0px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    .ellipse-13 {
-        background: #ed6a5e;
-        border-radius: 50%;
-        border-style: solid;
-        border-color: #d24f42;
-        border-width: 0.5px;
-        width: 12px;
-        height: 12px;
-        position: absolute;
-        left: 10px;
-        top: 6px;
-    }
-    .ellipse-15 {
-        background: #f5bf4f;
-        border-radius: 50%;
-        border-style: solid;
-        border-color: #d7a13f;
-        border-width: 0.5px;
-        width: 12px;
-        height: 12px;
-        position: absolute;
-        left: 30px;
-        top: 6px;
-    }
-    .ellipse-16 {
-        background: #61c553;
-        border-radius: 50%;
-        border-style: solid;
-        border-color: #51a73d;
-        border-width: 0.5px;
-        width: 12px;
-        height: 12px;
-        position: absolute;
-        left: 50px;
-        top: 6px;
-    }
-    .frame-32 {
-        background: var(--white, #fafafa);
-        border-radius: 12px;
-        width: 1073px;
-        height: 1005px;
-        position: absolute;
-        left: 827px;
-        top: 44px;
-        box-shadow: var(
-            --shadow-section-box-shadow,
-            0px 7px 14px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-    .history {
-        width: 407px;
-        height: 1034px;
-        position: absolute;
-        left: 666px;
-        top: -70px;
-    }
-    .frame-25 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 10px;
-        padding: 6px 6px 6px 6px;
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
+        gap: 16px;
         align-items: flex-start;
         justify-content: flex-start;
         position: absolute;
         left: 20px;
-        top: 942px;
+        top: 102px;
+    }
+
+    .batch-1 {
+        background: var(--blueaccent-light, #d1dffa);
+        border-radius: 10px;
+        padding: 6px;
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        position: relative;
         box-shadow: var(
             --shadow-kachel-box-shadow,
             0px 2px 3px 0px rgba(31, 37, 71, 0.25)
         );
     }
+
     ._00009-1938723002 {
         border-radius: 4px;
         flex-shrink: 0;
@@ -3071,6 +1572,7 @@
         height: 80px;
         position: relative;
     }
+
     ._00014-446255131 {
         border-radius: 4px;
         flex-shrink: 0;
@@ -3078,6 +1580,7 @@
         height: 80px;
         position: relative;
     }
+
     ._00012-3684755115 {
         border-radius: 4px;
         flex-shrink: 0;
@@ -3085,6 +1588,7 @@
         height: 80px;
         position: relative;
     }
+
     ._00013-3684755116-6 {
         border-radius: 4px;
         border-style: solid;
@@ -3095,23 +1599,122 @@
         height: 80px;
         position: relative;
     }
-    .frame-252 {
+
+    .batch-2 {
         background: var(--bluebackground, #edeef3);
         border-radius: 10px;
-        padding: 6px 6px 6px 6px;
+        padding: 6px;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         gap: 6px;
         align-items: flex-start;
         justify-content: flex-start;
-        position: absolute;
-        left: 20px;
-        top: 535px;
+        flex-shrink: 0;
+        position: relative;
         box-shadow: var(
             --shadow-kachel-box-shadow,
             0px 2px 3px 0px rgba(31, 37, 71, 0.25)
         );
     }
+
+    ._00009-446255139 {
+        border-radius: 4px;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+    }
+
+    ._00010-446255140 {
+        border-radius: 4px;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+    }
+
+    ._00011-446255141 {
+        border-radius: 4px;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+    }
+
+    ._00012-446255142 {
+        border-radius: 4px;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+    }
+
+    .batch-3 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 10px;
+        padding: 6px;
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        position: relative;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+    }
+
+    ._00013-446255143 {
+        border-radius: 4px;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+    }
+
+    ._00014-446255144 {
+        border-radius: 4px;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+    }
+
+    ._00015-446255145 {
+        border-radius: 4px;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+    }
+
+    ._00016-446255146 {
+        border-radius: 4px;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+    }
+
+    .batch-4 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 10px;
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        position: relative;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+    }
+
     .frame-31 {
         display: flex;
         flex-direction: row;
@@ -3121,6 +1724,7 @@
         flex-shrink: 0;
         position: relative;
     }
+
     ._00005-3807344773 {
         border-radius: 4px;
         flex-shrink: 0;
@@ -3128,6 +1732,7 @@
         height: 80px;
         position: relative;
     }
+
     ._00004-3807344772 {
         border-radius: 4px;
         flex-shrink: 0;
@@ -3135,6 +1740,7 @@
         height: 80px;
         position: relative;
     }
+
     ._00015-446255132 {
         border-radius: 4px;
         flex-shrink: 0;
@@ -3142,6 +1748,7 @@
         height: 80px;
         position: relative;
     }
+
     ._00016-446255133 {
         border-radius: 4px;
         flex-shrink: 0;
@@ -3149,6 +1756,7 @@
         height: 80px;
         position: relative;
     }
+
     .frame-30 {
         display: flex;
         flex-direction: row;
@@ -3158,6 +1766,7 @@
         flex-shrink: 0;
         position: relative;
     }
+
     ._00007-1938723000 {
         border-radius: 4px;
         flex-shrink: 0;
@@ -3165,6 +1774,7 @@
         height: 80px;
         position: relative;
     }
+
     ._00003-3807344771 {
         border-radius: 4px;
         flex-shrink: 0;
@@ -3172,119 +1782,24 @@
         height: 80px;
         position: relative;
     }
-    .frame-26 {
+
+    .batch-5 {
         background: var(--bluebackground, #edeef3);
         border-radius: 10px;
-        padding: 6px 6px 6px 6px;
+        padding: 6px;
         display: flex;
         flex-direction: row;
         gap: 6px;
         align-items: flex-start;
         justify-content: flex-start;
-        position: absolute;
-        left: 20px;
-        top: 835px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-    }
-    ._00011-3684755114 {
-        border-radius: 4px;
         flex-shrink: 0;
-        width: 80px;
-        height: 80px;
         position: relative;
-    }
-    ._00002-3807344770 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-    ._00006-1938722999 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-    ._00008-1938723001 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-    .frame-28 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 10px;
-        padding: 6px 6px 6px 6px;
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        position: absolute;
-        left: 20px;
-        top: 428px;
         box-shadow: var(
             --shadow-kachel-box-shadow,
             0px 2px 3px 0px rgba(31, 37, 71, 0.25)
         );
     }
-    .frame-29 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 10px;
-        padding: 6px 6px 6px 6px;
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        position: absolute;
-        left: 20px;
-        top: 321px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-    }
-    .frame-302 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 10px;
-        padding: 6px 6px 6px 6px;
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        position: absolute;
-        left: 20px;
-        top: 214px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-    }
-    .frame-27 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 10px;
-        padding: 6px 6px 6px 6px;
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        position: absolute;
-        left: 20px;
-        top: 728px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-    }
+
     ._00001-1445990440 {
         border-radius: 4px;
         flex-shrink: 0;
@@ -3292,6 +1807,7 @@
         height: 80px;
         position: relative;
     }
+
     ._00010-3684755113 {
         border-radius: 4px;
         flex-shrink: 0;
@@ -3299,6 +1815,7 @@
         height: 80px;
         position: relative;
     }
+
     ._00017-446255134 {
         border-radius: 4px;
         flex-shrink: 0;
@@ -3306,138 +1823,152 @@
         height: 80px;
         position: relative;
     }
-    .frame-312 {
+
+    .batch-6 {
         background: var(--bluebackground, #edeef3);
         border-radius: 10px;
-        padding: 6px 6px 6px 6px;
+        padding: 6px;
         display: flex;
         flex-direction: row;
         gap: 6px;
         align-items: flex-start;
         justify-content: flex-start;
-        position: absolute;
-        left: 20px;
-        top: 107px;
+        flex-shrink: 0;
+        position: relative;
         box-shadow: var(
             --shadow-kachel-box-shadow,
             0px 2px 3px 0px rgba(31, 37, 71, 0.25)
         );
     }
-    .frame-322 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 10px;
-        padding: 6px 6px 6px 6px;
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        position: absolute;
-        left: 20px;
-        top: 0px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
+
+    ._00011-3684755114 {
+        border-radius: 4px;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
     }
-    .fade {
-        background: var(
-            --fade,
-            linear-gradient(
-                180deg,
-                rgba(250, 250, 250, 0) 0%,
-                rgba(250, 250, 250, 1) 89.58333134651184%
-            )
-        );
-        width: 407px;
-        height: 68px;
-        position: absolute;
-        left: 407px;
-        top: 138px;
-        transform-origin: 0 0;
-        transform: rotate(-180deg) scale(1, 1);
+
+    ._00002-3807344770 {
+        border-radius: 4px;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
     }
-    .scroll-bar2 {
+
+    ._00006-1938722999 {
+        border-radius: 4px;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+    }
+
+    ._00008-1938723001 {
+        border-radius: 4px;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+    }
+
+    .scroll-bar {
         width: 7px;
-        height: 949px;
+        height: 874px;
         position: absolute;
         left: 392px;
-        top: 1034px;
+        top: 976px;
         transform-origin: 0 0;
         transform: rotate(-180deg) scale(1, 1);
     }
-    .rectangle-82 {
+
+    .rectangle-8 {
         background: var(--bluebackground, #edeef3);
         border-radius: 100px;
         width: 7px;
-        height: 949px;
+        height: 874px;
         position: absolute;
         left: 0px;
         top: 0px;
     }
-    .rectangle-92 {
+
+    .rectangle-9 {
         background: var(--bluemid, #94a0b8);
         border-radius: 100px;
         width: 7px;
-        height: 315.63px;
+        height: 290.68px;
         position: absolute;
         left: 0px;
         top: 0px;
     }
-    .gro-e-ansicht {
-        display: flex;
-        flex-direction: column;
-        gap: 19px;
-        align-items: center;
-        justify-content: flex-start;
-        width: 606px;
-        height: 697px;
+
+    .history-title {
+        background: var(--white, #fafafa);
+        width: 407px;
+        height: 101px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .history-shadow {
+        background: var(--white, #fafafa);
+        border-style: solid;
+        border-color: var(--bluebackground, #edeef3);
+        border-width: 0px 0px 2px 0px;
+        width: 360px;
+        height: 102px;
+        position: absolute;
+        left: 15px;
+        top: 0px;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+    }
+
+    .history-bg {
+        background: var(--white, #fafafa);
+        width: 407px;
+        height: 101px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .history2 {
+        color: var(--blue-heading, #1f4ead);
+        text-align: left;
+        font: var(--h-1, 500 24px "IBM Plex Sans", sans-serif);
         position: absolute;
         left: 20px;
         top: 20px;
     }
+
     .result {
-        background: linear-gradient(to left, #fafafa, #fafafa);
-        flex-shrink: 0;
-        width: 606px;
-        height: 606px;
-        position: relative;
-        box-shadow: 0px 2px 3px 0px rgba(31, 37, 71, 0.25);
-        overflow: hidden;
+        background: var(--white, #fafafa);
+        border-radius: 12px;
+        width: 646px;
+        height: 996px;
+        position: absolute;
+        left: 827px;
+        top: 64px;
+        box-shadow: var(
+            --shadow-section-2-box-shadow,
+            0px 4px 10px 0px rgba(31, 37, 71, 0.15)
+        );
     }
-    .progress-bar {
-        background: linear-gradient(to left, #d1dffa, #d1dffa),
-            linear-gradient(to left, #edeef3, #edeef3);
-        padding: 0px 8px 0px 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 0px;
-        align-items: flex-start;
-        justify-content: center;
-        flex-shrink: 0;
-        width: 606px;
-        height: 22px;
-        position: relative;
-        overflow: hidden;
-    }
-    .image-4-100 {
-        color: var(--bluetext, #47536b);
-        text-align: left;
-        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: relative;
-        width: 114px;
-        height: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    .buttons2 {
-        flex-shrink: 0;
+
+    .result-buttons {
         width: 606px;
         height: 30px;
-        position: relative;
+        position: absolute;
+        left: 20px;
+        top: 946px;
     }
-    .button6 {
+
+    .button {
         background: var(--blueaccent, #195de5);
         border-radius: 4px;
         padding: 8px 12px 8px 12px;
@@ -3455,7 +1986,8 @@
             0px 2px 3px 0px rgba(31, 37, 71, 0.25)
         );
     }
-    .button7 {
+
+    .button2 {
         color: var(--white, #fafafa);
         text-align: left;
         font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
@@ -3464,18 +1996,21 @@
         align-items: center;
         justify-content: flex-start;
     }
+
     ._16-px-arrow-left {
         position: absolute;
         left: 0px;
         top: 8px;
         overflow: visible;
     }
+
     ._16-px-arrow-right {
         position: absolute;
         left: 26px;
         top: 8px;
         overflow: visible;
     }
+
     .button-icon {
         background: var(--blueaccent-light, #d1dffa);
         border-radius: 4px;
@@ -3490,10 +2025,1802 @@
         );
         overflow: hidden;
     }
+
     ._16-px-folder {
         position: absolute;
         left: 7px;
         top: 7px;
         overflow: visible;
+    }
+
+    .result2 {
+        background: var(--white, #fafafa);
+        border-radius: 4px;
+        width: 606px;
+        height: 606px;
+        position: absolute;
+        left: 20px;
+        top: 102px;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+    }
+
+    ._00013-3684755116-1 {
+        width: 606px;
+        height: 606px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .progress {
+        width: 606px;
+        height: 27px;
+        position: absolute;
+        left: 20px;
+        top: 728px;
+    }
+
+    .progress-bar {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 4px;
+        width: 606px;
+        height: 7px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        overflow: hidden;
+    }
+
+    .rectangle-38 {
+        background: var(--bluebackground, #edeef3);
+        width: 606px;
+        height: 7px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .rectangle-39 {
+        background: var(--blueaccent-light, #d1dffa);
+        border-radius: 100px;
+        width: 606px;
+        height: 7px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .progress-100 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 13px;
+        width: 114px;
+        height: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    ._0-00-min {
+        color: var(--bluetext, #47536b);
+        text-align: right;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 492px;
+        top: 13px;
+        width: 114px;
+        height: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .result3 {
+        color: var(--blue-heading, #1f4ead);
+        text-align: left;
+        font: var(--h-1, 500 24px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 20px;
+        top: 20px;
+    }
+
+    .buttons {
+        background: var(--white, #fafafa);
+        border-radius: 12px;
+        width: 757px;
+        height: 70px;
+        position: absolute;
+        left: 20px;
+        top: 990px;
+        box-shadow: var(
+            --shadow-section-2-box-shadow,
+            0px 4px 10px 0px rgba(31, 37, 71, 0.15)
+        );
+        overflow: hidden;
+    }
+
+    .button3 {
+        color: var(--white, #fafafa);
+        background: var(--blueaccent, #195de5);
+        border-radius: 4px;
+        padding: 8px 12px 8px 12px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+        align-items: flex-start;
+        justify-content: center;
+        width: 290px;
+        position: absolute;
+        left: 447px;
+        top: 20px;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        border: none;
+    }
+
+
+
+    .button4 {
+        background: var(--blueaccent-light, #d1dffa);
+        border-radius: 4px;
+        padding: 8px 12px 8px 12px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+        align-items: flex-start;
+        justify-content: center;
+        width: 176px;
+        position: absolute;
+        left: 20px;
+        top: 20px;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+    }
+
+    .button5 {
+        color: var(--blueaccent, #195de5);
+        text-align: left;
+        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .button6 {
+        background: var(--blueaccent-light, #d1dffa);
+        border-radius: 4px;
+        padding: 8px 12px 8px 12px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+        align-items: flex-start;
+        justify-content: center;
+        width: 176px;
+        position: absolute;
+        left: 216px;
+        top: 20px;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+    }
+
+    .settings {
+        background: var(--white, #fafafa);
+        border-radius: 12px;
+        width: 330px;
+        height: 377px;
+        position: absolute;
+        left: 447px;
+        top: 593px;
+        box-shadow: var(
+            --shadow-section-2-box-shadow,
+            0px 4px 10px 0px rgba(31, 37, 71, 0.15)
+        );
+        overflow: hidden;
+    }
+
+    .settings2 {
+        color: var(--blue-heading, #1f4ead);
+        text-align: left;
+        font: var(--h-1, 500 24px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 20px;
+        top: 20px;
+    }
+
+    .resolution {
+        width: 126px;
+        height: 72px;
+        position: absolute;
+        left: 20px;
+        top: 285px;
+    }
+
+    .input-field {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 3px;
+        border-style: solid;
+        border-color: var(--bluemid, #94a0b8);
+        border-width: 1px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 90px;
+        position: absolute;
+        left: 0px;
+        top: 22px;
+    }
+
+    .input {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .input-field2 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 3px;
+        border-style: solid;
+        border-color: var(--bluemid, #94a0b8);
+        border-width: 1px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 90px;
+        position: absolute;
+        left: 0px;
+        top: 50px;
+    }
+
+    .width {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 96px;
+        top: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .hight {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 96px;
+        top: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .resolution2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .divider {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 2px;
+        width: 290px;
+        height: 2px;
+        position: absolute;
+        left: 20px;
+        top: 263px;
+    }
+
+    .model {
+        width: 135px;
+        height: 44px;
+        position: absolute;
+        left: 20px;
+        top: 71px;
+    }
+
+    .drop-down {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 3px;
+        border-style: solid;
+        border-color: var(--bluemid, #94a0b8);
+        border-width: 1px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 135px;
+        position: absolute;
+        left: 0px;
+        top: 22px;
+    }
+
+    .drop-down2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    ._8-px-caret-sort {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .model2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    ._12-px-help {
+        position: absolute;
+        left: 117px;
+        top: 1px;
+        overflow: visible;
+    }
+
+    .sampler {
+        width: 135px;
+        height: 44px;
+        position: absolute;
+        left: 175px;
+        top: 71px;
+    }
+
+    ._8-px-caret-sort2 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .sampler2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    ._12-px-help2 {
+        position: absolute;
+        left: 117px;
+        top: 1px;
+        overflow: visible;
+    }
+
+    .seed {
+        width: 135px;
+        height: 44px;
+        position: absolute;
+        left: 20px;
+        top: 199px;
+    }
+
+    .input-field3 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 3px;
+        border-style: solid;
+        border-color: var(--bluemid, #94a0b8);
+        border-width: 1px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 135px;
+        position: absolute;
+        left: 0px;
+        top: 22px;
+    }
+
+    .input2 {
+        color: var(--bluemid, #94a0b8);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .seed2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    ._12-px-help3 {
+        position: absolute;
+        left: 117px;
+        top: 1px;
+        overflow: visible;
+    }
+
+    .guidance-scale {
+        width: 135px;
+        height: 44px;
+        position: absolute;
+        left: 20px;
+        top: 135px;
+    }
+
+    .guidance-scale2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .input-field4 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 3px;
+        border-style: solid;
+        border-color: var(--bluemid, #94a0b8);
+        border-width: 1px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 29px;
+        position: absolute;
+        left: 106px;
+        top: 22px;
+    }
+
+    .slider {
+        width: 100px;
+        height: 8px;
+        position: absolute;
+        left: 0px;
+        top: 27px;
+    }
+
+    .rectangle-25 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 2px;
+        width: 100px;
+        height: 4px;
+        position: absolute;
+        left: 0px;
+        top: 2px;
+    }
+
+    .ellipse-12 {
+        background: var(--bluemid, #94a0b8);
+        border-radius: 50%;
+        width: 8px;
+        height: 8px;
+        position: absolute;
+        left: calc(50% - 6px);
+        top: calc(50% - 4px);
+    }
+
+    ._12-px-help4 {
+        position: absolute;
+        left: 117px;
+        top: 1px;
+        overflow: visible;
+    }
+
+    .steps {
+        width: 135px;
+        height: 44px;
+        position: absolute;
+        left: 175px;
+        top: 135px;
+    }
+
+    .steps2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    ._12-px-help5 {
+        position: absolute;
+        left: 117px;
+        top: 1px;
+        overflow: visible;
+    }
+
+    .batch {
+        width: 129px;
+        height: 72px;
+        position: absolute;
+        left: 175px;
+        top: 285px;
+    }
+
+    .count {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 96px;
+        top: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .size {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 96px;
+        top: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .batch2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    ._12-px-help6 {
+        position: absolute;
+        left: 117px;
+        top: 1px;
+        overflow: visible;
+    }
+
+    .prompt {
+        background: var(--white, #fafafa);
+        border-radius: 12px;
+        width: 330px;
+        height: 509px;
+        position: absolute;
+        left: 447px;
+        top: 64px;
+        box-shadow: var(
+            --shadow-section-2-box-shadow,
+            0px 4px 10px 0px rgba(31, 37, 71, 0.15)
+        );
+        overflow: hidden;
+    }
+
+    .raw-prompt {
+        width: 290px;
+        height: 97px;
+        position: absolute;
+        left: 20px;
+        top: 392px;
+    }
+
+    ._16-px-chevron-down {
+        position: absolute;
+        left: 290px;
+        top: 20px;
+        transform: translate(-16px, -16px);
+        overflow: visible;
+    }
+
+    .rawprompt-frame {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        border-style: solid;
+        border-color: var(--bluemid, #94a0b8);
+        border-width: 1px;
+        padding: 7px 9px 7px 9px;
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 290px;
+        height: 66px;
+        position: absolute;
+        left: 0px;
+        top: 31px;
+        overflow: hidden;
+    }
+
+    .negative-prompt-text {
+        text-align: left;
+        font: var(--text-mono, 400 11px "IBM Plex Mono", sans-serif);
+        position: relative;
+        flex: 1;
+    }
+
+    .negative-prompt-text-span {
+        color: var(--blueaccent, #195de5);
+        font: var(--text-mono, 400 11px "IBM Plex Mono", sans-serif);
+    }
+
+    .negative-prompt-text-span2 {
+        color: var(--bluetext, #47536b);
+        font: var(--text-mono, 400 11px "IBM Plex Mono", sans-serif);
+    }
+
+    .negative-prompt-text-span3 {
+        color: var(--blueaccent, #195de5);
+        font: var(--text-mono, 400 11px "IBM Plex Mono", sans-serif);
+    }
+
+    .raw-prompt2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .tags {
+        width: 290px;
+        height: 97px;
+        position: absolute;
+        left: 20px;
+        top: 285px;
+    }
+
+    .tag-frame {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        padding: 8px;
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        width: 290px;
+        height: 66px;
+        position: absolute;
+        left: 0px;
+        top: 31px;
+        overflow: hidden;
+    }
+
+    .tag {
+        background: var(--blueaccent, #195de5);
+        border-radius: 3px;
+        padding: 4px 6px 4px 6px;
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+        align-items: center;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .frame-19 {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        align-items: center;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    ._8-px-close-filled {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .tag2 {
+        color: var(--white, #fafafa);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .frame-20 {
+        display: flex;
+        flex-direction: row;
+        gap: 2px;
+        align-items: center;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    ._8-px-subtract {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._1-0 {
+        color: var(--white, #fafafa);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    ._8-px-add {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._8-px-close-filled2 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._8-px-subtract2 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._8-px-add2 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._8-px-close-filled3 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._8-px-subtract3 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._8-px-add3 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .tags2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .negative-content {
+        width: 290px;
+        height: 97px;
+        position: absolute;
+        left: 20px;
+        top: 178px;
+    }
+
+    .negative-content-frame {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        border-style: solid;
+        border-color: var(--bluemid, #94a0b8);
+        border-width: 1px;
+        padding: 7px 9px 7px 9px;
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 290px;
+        height: 66px;
+        position: absolute;
+        left: 0px;
+        top: 31px;
+        overflow: hidden;
+    }
+
+    .negative-prompt-text2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        align-self: stretch;
+        flex: 1;
+    }
+
+    .negative-content2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .content {
+        width: 290px;
+        height: 97px;
+        position: absolute;
+        left: 20px;
+        top: 71px;
+    }
+
+    .content2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .content-frame {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        align-self: stretch;
+        flex: 1;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        border-style: solid;
+        border-color: var(--bluemid, #94a0b8);
+        border-width: 1px;
+        padding: 7px 9px 7px 9px;
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 290px;
+        height: 66px;
+        position: absolute;
+        left: 0px;
+        top: 31px;
+        overflow: hidden;
+    }
+
+    .prompt-text {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        align-self: stretch;
+        flex: 1;
+    }
+
+    .prompt2 {
+        color: var(--blue-heading, #1f4ead);
+        text-align: left;
+        font: var(--h-1, 500 24px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 20px;
+        top: 20px;
+    }
+
+    .tags3 {
+        background: var(--white, #fafafa);
+        border-radius: 12px;
+        width: 407px;
+        height: 906px;
+        position: absolute;
+        left: 20px;
+        top: 64px;
+        box-shadow: var(
+            --shadow-section-2-box-shadow,
+            0px 4px 10px 0px rgba(31, 37, 71, 0.15)
+        );
+        overflow: hidden;
+    }
+
+    .styles {
+        width: 350px;
+        height: 419px;
+        position: absolute;
+        left: 20px;
+        top: 751px;
+    }
+
+    .styles2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .optional {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: 300 16px "IBM Plex Sans", sans-serif;
+        position: absolute;
+        left: 50px;
+        top: 0px;
+    }
+
+    .drop-down3 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 3px;
+        border-style: solid;
+        border-color: var(--bluemid, #94a0b8);
+        border-width: 1px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100px;
+        position: absolute;
+        left: 250px;
+        top: 3px;
+    }
+
+    ._8-px-caret-sort3 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .frame-18 {
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        position: absolute;
+        left: 0px;
+        top: 40px;
+    }
+
+    .chip {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 3px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+        align-items: center;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .chip2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .chip3 {
+        background: var(--bluemid, #94a0b8);
+        border-radius: 3px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+        align-items: center;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .chip4 {
+        color: var(--white, #fafafa);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .divider2 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 2px;
+        width: 350px;
+        height: 2px;
+        position: absolute;
+        left: 0px;
+        top: 417px;
+    }
+
+    .styles-kacheln {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        width: 350px;
+        position: absolute;
+        left: 0px;
+        top: 78px;
+    }
+
+    .kachel {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        padding: 5px;
+        display: flex;
+        flex-direction: row;
+        gap: 2px;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+    }
+
+    .vorschau {
+        border-radius: 2px;
+        flex-shrink: 0;
+        width: 70px;
+        height: 52px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .rectangle-82 {
+        width: 71px;
+        height: 52px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    ._10-px-checkbox {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .photography {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        width: 58px;
+        height: 15px;
+    }
+
+    ._10-px-checkbox2 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._10-px-checkbox3 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._10-px-checkbox4 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .rectangle-7 {
+        border-radius: 2px;
+        width: 70px;
+        height: 52px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    ._10-px-checkbox5 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._10-px-checkbox6 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._10-px-checkbox7 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._10-px-checkbox8 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .techniques {
+        width: 350px;
+        height: 417px;
+        position: absolute;
+        left: 20px;
+        top: 314px;
+    }
+
+    .techniques2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .optional2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: 300 16px "IBM Plex Sans", sans-serif;
+        position: absolute;
+        left: 89px;
+        top: 0px;
+    }
+
+    ._8-px-caret-sort4 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .techniques-tabs {
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        width: 350px;
+        position: absolute;
+        left: 0px;
+        top: 40px;
+    }
+
+    .show-more {
+        position: absolute;
+        inset: 0;
+    }
+
+    ._10-px-chevron-down {
+        position: absolute;
+        left: 0px;
+        top: 388px;
+        overflow: visible;
+    }
+
+    .show-more2 {
+        color: var(--blueaccent, #195de5);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 11px;
+        top: 385px;
+    }
+
+    .divider3 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 2px;
+        width: 350px;
+        height: 2px;
+        position: absolute;
+        left: 0px;
+        top: 415px;
+    }
+
+    .techniques-kacheln {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        width: 350px;
+        position: absolute;
+        left: 0px;
+        top: 105px;
+    }
+
+    ._10-px-checkbox9 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._10-px-checkbox10 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._10-px-checkbox11 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .rectangle-72 {
+        width: 71px;
+        height: 52px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    ._10-px-checkbox12 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .airbrush {
+        width: 71.5px;
+        height: 52px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    ._10-px-checkbox13 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .kachel2 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        border-style: solid;
+        border-color: var(--blueaccent, #195de5);
+        border-width: 1px;
+        padding: 5px 4px 5px 5px;
+        display: flex;
+        flex-direction: row;
+        gap: 2px;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+    }
+
+    .text {
+        flex-shrink: 0;
+        width: 71px;
+        height: 15px;
+        position: relative;
+    }
+
+    ._10-px-checkbox-checked-filled {
+        position: absolute;
+        left: 0px;
+        top: 2.5px;
+        overflow: visible;
+    }
+
+    .photography2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 12px;
+        top: 0px;
+        width: 59px;
+        height: 15px;
+    }
+
+    .gouache {
+        width: 71.5px;
+        height: 52px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    ._10-px-checkbox14 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._10-px-checkbox-checked-filled2 {
+        position: absolute;
+        left: 0px;
+        top: 2.5px;
+        overflow: visible;
+    }
+
+    ._10-px-checkbox15 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._10-px-checkbox16 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._10-px-checkbox17 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._10-px-checkbox18 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .medium {
+        width: 350px;
+        height: 223px;
+        position: absolute;
+        left: 20px;
+        top: 71px;
+    }
+
+    .medium2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .mediumkacheln {
+        position: absolute;
+        inset: 0;
+    }
+
+    .kachel3 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        align-items: flex-end;
+        justify-content: flex-start;
+        position: absolute;
+        left: 0px;
+        top: 31px;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+        border: none;
+    }
+
+    .photography3 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        width: 71px;
+        height: 16px;
+    }
+
+    .kachel4 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        align-items: flex-end;
+        justify-content: flex-start;
+        position: absolute;
+        left: 0px;
+        top: 121px;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+    }
+
+    .kachel5 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        align-items: flex-end;
+        justify-content: flex-start;
+        position: absolute;
+        left: 90px;
+        top: 31px;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+    }
+
+    .kachel6 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        align-items: flex-end;
+        justify-content: flex-start;
+        position: absolute;
+        left: 90px;
+        top: 121px;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+    }
+
+    .kachel7 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        border-style: solid;
+        border-color: var(--blueaccent, #195de5);
+        border-width: 1px;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 80px;
+        height: 80px;
+        position: absolute;
+        left: 180px;
+        top: 31px;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+    }
+
+    .photography4 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        width: 70px;
+        height: 15px;
+    }
+
+    .kachel8 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        align-items: flex-end;
+        justify-content: flex-start;
+        position: absolute;
+        left: 180px;
+        top: 121px;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+    }
+
+    .kachel9 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        align-items: flex-end;
+        justify-content: flex-start;
+        position: absolute;
+        left: 270px;
+        top: 31px;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+    }
+
+    .kachel10 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 80px;
+        height: 80px;
+        position: absolute;
+        left: 270px;
+        top: 121px;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+    }
+
+    .rectangle-73 {
+        border-radius: 2px;
+        width: 70px;
+        height: 52px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        filter: blur(2px);
+    }
+
+    .new-idea {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        width: 70px;
+        height: 15px;
+    }
+
+    ._32-px-add-filled {
+        flex-shrink: 0;
+        position: absolute;
+        left: 23px;
+        top: 15px;
+        overflow: visible;
+    }
+
+    .medium-devider {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 2px;
+        width: 350px;
+        height: 2px;
+        position: absolute;
+        left: 0px;
+        top: 221px;
+    }
+
+    .fade {
+        background: var(
+            --fade,
+            linear-gradient(
+                180deg,
+                rgba(250, 250, 250, 0) 0%,
+                rgba(250, 250, 250, 1) 89.58333134651184%
+            )
+        );
+        width: 385px;
+        height: 90px;
+        position: absolute;
+        left: 0px;
+        top: 816px;
+    }
+
+    .scroll-bar2 {
+        width: 7px;
+        height: 815px;
+        position: absolute;
+        left: 385px;
+        top: 71px;
+    }
+
+    .rectangle-83 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 100px;
+        width: 7px;
+        height: 815px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .rectangle-92 {
+        background: var(--bluemid, #94a0b8);
+        border-radius: 100px;
+        width: 7px;
+        height: 271.06px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .search {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 3px;
+        border-style: solid;
+        border-color: var(--bluemid, #94a0b8);
+        border-width: 1px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 170px;
+        position: absolute;
+        left: 200px;
+        top: 25px;
+    }
+
+    .search2 {
+        color: var(--bluemid, #94a0b8);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    ._8-px-search {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .tags4 {
+        color: var(--blue-heading, #1f4ead);
+        text-align: left;
+        font: var(--h-1, 500 24px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 20px;
+        top: 20px;
+    }
+
+    .top-bar {
+        background: var(--white, #fafafa);
+        border-style: solid;
+        border-color: rgba(148, 160, 184, 0.5);
+        border-width: 0px 0px 1px 0px;
+        width: 1920px;
+        height: 44px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        overflow: hidden;
+    }
+
+    .green-ellipse {
+        background: #ed6a5e;
+        border-radius: 50%;
+        border-style: solid;
+        border-color: #d24f42;
+        border-width: 0.5px;
+        width: 12px;
+        height: 12px;
+        position: absolute;
+        left: 20px;
+        top: 16px;
+    }
+
+    .yellow-ellipse {
+        background: #f5bf4f;
+        border-radius: 50%;
+        border-style: solid;
+        border-color: #d7a13f;
+        border-width: 0.5px;
+        width: 12px;
+        height: 12px;
+        position: absolute;
+        left: 40px;
+        top: 16px;
+    }
+
+    .red-ellipse {
+        background: #61c553;
+        border-radius: 50%;
+        border-style: solid;
+        border-color: #51a73d;
+        border-width: 0.5px;
+        width: 12px;
+        height: 12px;
+        position: absolute;
+        left: 60px;
+        top: 16px;
+    }
+
+    .projects {
+        text-align: left;
+        font: 400 16px "IBM Plex Sans", sans-serif;
+        position: absolute;
+        left: 82px;
+        top: 0px;
+        width: 380px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .projects-span {
+        color: var(--bluemid, #94a0b8);
+        font: 400 16px "IBM Plex Sans", sans-serif;
+    }
+
+    .projects-span2 {
+        color: var(--bluetext, #47536b);
+        font: 400 16px "IBM Plex Sans", sans-serif;
     }
 </style>
