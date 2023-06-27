@@ -25,6 +25,8 @@
     let selectedButton = null;
     let generate = "Generate";
     let blur = false;
+    let openConf = false;
+    let openIdea = false;
 
     let selectedOil = false;
     let selectedInk = false;
@@ -328,8 +330,14 @@
         });
     }
 
-    function openConfiguration(){
-        blur = true;
+    function openConfiguration() {
+        blur = !blur;
+        openConf = !openConf;
+    }
+
+    function openNewIdea() {
+        blur = !blur;
+        openIdea = !openIdea;
     }
 
     if (browser) {
@@ -360,8 +368,25 @@
 
 <div class="main">
     <!-- <div class={blur ? 'blur' : ' '} /> -->
+    <a
+        href=""
+        class={openConf ? "closeConf" : "invisible"}
+        on:click={() => openConfiguration()}
+    />
 
-   
+    <a
+        href=""
+        class={openIdea ? "closeIdea" : "invisible"}
+        on:click={() => openNewIdea()}
+    />
+
+    <img
+        class={openIdea ? "popup2" : "invisible"}
+        src="addNewIdea.png"
+        alt=""
+    />
+
+    <img class={openConf ? "popup" : "invisible"} src="popup.png" alt="" />
 
     <div class="result">
         <div class="result-buttons">
@@ -447,7 +472,9 @@
         </div>
 
         <div class="button6">
-            <buttonConf on:click={() => openConfiguration()}>Open Configurations</buttonConf>
+            <buttonConf on:click={() => openConfiguration()}
+                >Open Configurations</buttonConf
+            >
         </div>
     </div>
 
@@ -1076,7 +1103,7 @@
                         />
                     </svg>
 
-                    <div class="show-more2">show more</div>
+                    <div class="show-more2">show less</div>
                 </div>
 
                 <div class="divider3" />
@@ -1304,27 +1331,32 @@
                         <div class="photography3">Digital Art</div>
                     </button>
 
-                    <div class="kachel5">
-                        <div class="vorschau">
-                            <img class="rectangle-73" src="rectangle-73.png" />
+                    <a href="" on:click={() => openNewIdea()}>
+                        <div class="kachel5">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-73"
+                                    src="rectangle-73.png"
+                                />
+                            </div>
+
+                            <div class="new-idea">New Idea</div>
+
+                            <svg
+                                class="_32-px-add-filled"
+                                width="32"
+                                height="32"
+                                viewBox="0 0 32 32"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M16 2C12.3009 2.04476 8.76586 3.53412 6.14999 6.14999C3.53412 8.76586 2.04476 12.3009 2 16C2.04476 19.6991 3.53412 23.2341 6.14999 25.85C8.76586 28.4659 12.3009 29.9552 16 30C19.6991 29.9552 23.2341 28.4659 25.85 25.85C28.4659 23.2341 29.9552 19.6991 30 16C29.9552 12.3009 28.4659 8.76586 25.85 6.14999C23.2341 3.53412 19.6991 2.04476 16 2V2ZM24 17H17V24H15V17H8V15H15V8H17V15H24V17Z"
+                                    fill="#FAFAFA"
+                                />
+                            </svg>
                         </div>
-
-                        <div class="new-idea">New Idea</div>
-
-                        <svg
-                            class="_32-px-add-filled"
-                            width="32"
-                            height="32"
-                            viewBox="0 0 32 32"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M16 2C12.3009 2.04476 8.76586 3.53412 6.14999 6.14999C3.53412 8.76586 2.04476 12.3009 2 16C2.04476 19.6991 3.53412 23.2341 6.14999 25.85C8.76586 28.4659 12.3009 29.9552 16 30C19.6991 29.9552 23.2341 28.4659 25.85 25.85C28.4659 23.2341 29.9552 19.6991 30 16C29.9552 12.3009 28.4659 8.76586 25.85 6.14999C23.2341 3.53412 19.6991 2.04476 16 2V2ZM24 17H17V24H15V17H8V15H15V8H17V15H24V17Z"
-                                fill="#FAFAFA"
-                            />
-                        </svg>
-                    </div>
+                    </a>
                 </div>
 
                 <div class="medium-devider" />
@@ -1360,7 +1392,7 @@
         <div class="tags4">Tags</div>
     </div>
 
-      <div class="history">
+    <div class="history">
         <div class="batches" id="batches">
             <!-- <div class="batch-1" id="batch-1" /> -->
         </div>
@@ -1381,10 +1413,6 @@
     </div>
 
     <div class={blur ? "blur" : " "} />
-
-
-   
-
 
     <div class="top-bar">
         <div class="green-ellipse" />
@@ -3569,8 +3597,49 @@
         cursor: pointer;
     }
 
-
     /* Pop-Up CSS Anfang */
 
+    .popup {
+        width: 699px;
+        height: 741px;
+        flex-shrink: 0;
 
+        position: absolute;
+        left: 582px;
+        top: 192px;
+        z-index: 1;
+    }
+
+    .closeConf {
+        position: absolute;
+        left: 1205px;
+        top: 220px;
+        width: 36px;
+        height: 32px;
+        z-index: 2;
+    }
+
+    .invisible {
+        display: none;
+    }
+
+    .popup2 {
+        width: 408px;
+        height: 485px;
+        flex-shrink: 0;
+
+        position: absolute;
+        left: 733px;
+        top: 298px;
+        z-index: 1;
+    }
+
+    .closeIdea {
+        position: absolute;
+        left: 1076px;
+        top: 325px;
+        width: 36px;
+        height: 36px;
+        z-index: 2;
+    }
 </style>
