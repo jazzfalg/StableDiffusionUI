@@ -10,7 +10,7 @@
     let percentage = 0;
     let time = "00:00:00";
     let rawprompt = "";
-    let medium = "";
+    let medium = "A photograph of ";
     let tags = "";
     let batch = [];
     let currentImgs = [];
@@ -21,12 +21,25 @@
     let batchSize = 4;
     let negativePrompt = "";
     let id = 0;
-    let selectedMedium = null;
+    let currentMedium = "A painting of ";
     let selectedButton = null;
-    
+    let generate = "Generate";
+    let blur = false;
+
+    let selectedOil = false;
+    let selectedInk = false;
+    let selectedBrush = false;
+    let selectedGraffiti = false;
+    let selectedGouache = false;
+    let selectedWatercolor = false;
+    let selectedAirbrush = false;
+    let selectedAllaPrima = false;
+    let selectedPointilism = false;
+    let selectedImpasto = false;
+    let selectedStippling = false;
+    let selectedChiaroscuro = false;
+
     // 172.17.11.23:7860
-
-
 
     function handleButtonClick(event) {
         selectedButton = event.target;
@@ -40,10 +53,54 @@
     }
 
     function addMedium(med) {
+        currentMedium = med;
         medium = med;
     }
 
+    function checkSelected(tag) {
+        switch (tag) {
+            case "Oil Painting":
+                selectedOil = !selectedOil;
+                break;
+            case "Ink Painting":
+                selectedInk = !selectedInk;
+                break;
+            case "Brush Work":
+                selectedBrush = !selectedBrush;
+                break;
+            case "Graffiti":
+                selectedGraffiti = !selectedGraffiti;
+                break;
+            case "in the style of Gouache":
+                selectedGouache = !selectedGouache;
+                break;
+            case "Watercolor painting":
+                selectedWatercolor = !selectedWatercolor;
+                break;
+            case "Airbrush work":
+                selectedAirbrush = !selectedAirbrush;
+                break;
+            case "Alla Prima painting":
+                selectedAllaPrima = !selectedAllaPrima;
+                break;
+            case "Pointilism painting":
+                selectedPointilism = !selectedPointilism;
+                break;
+            case "Impasto painting":
+                selectedImpasto = !selectedImpasto;
+                break;
+            case "Stippling work":
+                selectedStippling = !selectedStippling;
+                break;
+            case "Chiaroscuro style":
+                selectedChiaroscuro = !selectedChiaroscuro;
+                break;
+        }
+    }
+
     function createTag(tag) {
+        checkSelected(tag);
+
         if (rawprompt.includes(tag)) {
             const element = document.getElementById(tag);
             element.remove();
@@ -76,12 +133,24 @@
     }, 0);
 
     async function sendPrompt() {
-        if (processing) return;
+        if (processing) {
+            console.log("Skip");
+            fetch("http://127.0.0.1:7860/sdapi/v1/skip", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+            });
+            return;
+        }
 
         if (userprompt == "") {
             alert("No Prompt");
             return;
         }
+
+        generate = "Skip";
 
         result = "result_before.png";
 
@@ -127,6 +196,7 @@
                 currentImgs.push(batch);
 
                 addToHistory(currentImgs);
+                generate = "Generate";
 
                 document.getElementById("progressBar").style.width = 100 + "%";
             })
@@ -166,7 +236,7 @@
             tiling: false,
             do_not_save_samples: false,
             do_not_save_grid: false,
-            negative_prompt: "",
+            negative_prompt: negativePrompt,
             eta: 0,
             s_churn: 0,
             s_tmax: 0,
@@ -258,6 +328,10 @@
         });
     }
 
+    function openConfiguration(){
+        blur = true;
+    }
+
     if (browser) {
         const batchImagesContainer = document.querySelector(".batches");
 
@@ -270,29 +344,24 @@
                 }
             }
         });
+
+        // const elements = document.getElementsByClassName("kachel3");
+        // for (let i = 0; i < elements.length; i++) {
+        //     elements[i].addEventListener("click", selectMedium, false);
+        // }
+
+        function selectMedium() {
+            // this.classList.remove("kachel3");
+            // this.classList.add("kachel3.active");
+            // console.log(this);
+        }
     }
 </script>
 
 <div class="main">
-    <div class="history">
-        <div class="batches" id="batches">
-            <!-- <div class="batch-1" id="batch-1" /> -->
-        </div>
+    <!-- <div class={blur ? 'blur' : ' '} /> -->
 
-        <!-- <div class="scroll-bar">
-            <div class="rectangle-8" />
-
-            <div class="rectangle-9" />
-        </div> -->
-
-        <div class="history-title">
-            <div class="history-shadow" />
-
-            <div class="history-bg" />
-
-            <div class="history2">History</div>
-        </div>
-    </div>
+   
 
     <div class="result">
         <div class="result-buttons">
@@ -369,16 +438,16 @@
     </div>
 
     <div class="buttons">
-        <button class="button3" on:click={() => sendPrompt()}>
-            Generate
-        </button>
+        <button2 class={processing ? "grey" : ""} on:click={() => sendPrompt()}>
+            {generate}
+        </button2>
 
         <div class="button4">
             <div class="button5">Save Configuration</div>
         </div>
 
         <div class="button6">
-            <div class="button5">Open Configurations</div>
+            <buttonConf on:click={() => openConfiguration()}>Open Configurations</buttonConf>
         </div>
     </div>
 
@@ -619,8 +688,8 @@
             <input class="input-field2" type="text" bind:value={batchSize} />
 
             <!-- <div class="input-field2">
-                <div class="input">1</div>
-            </div> -->
+                    <div class="input">1</div>
+                </div> -->
 
             <div class="count">Count</div>
 
@@ -674,7 +743,7 @@
                 </div>
             </div>
 
-            <div class="raw-prompt2">Raw Prompt</div>
+            <div class="raw-prompt2">Combined Prompt</div>
         </div>
 
         <div class="tags">
@@ -684,12 +753,7 @@
         </div>
 
         <div class="negative-content">
-           
-                <textarea
-                    bind:value={negativePrompt}
-                    class="content-frame"
-                />
-         
+            <textarea bind:value={negativePrompt} class="content-frame" />
 
             <div class="negative-content2">Negative Content</div>
         </div>
@@ -698,10 +762,10 @@
             <div class="content2">Content</div>
 
             <!-- <input
-                bind:value={userprompt}
-                on:keydown={onKeyDown}
-                class="content-frame"
-            /> -->
+                    bind:value={userprompt}
+                    on:keydown={onKeyDown}
+                    class="content-frame"
+                /> -->
 
             <textarea
                 bind:value={userprompt}
@@ -1018,339 +1082,137 @@
                 <div class="divider3" />
 
                 <div class="techniques-kacheln">
-                    <a href="" on:click={() => createTag("Oil Painting")}>
-                        <div class="kachel">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-82"
-                                    src="rectangle-82.png"
-                                />
-                            </div>
-
-                            <svg
-                                class="_10-px-checkbox9"
-                                width="10"
-                                height="11"
-                                viewBox="0 0 10 11"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                    fill="#195DE6"
-                                />
-                            </svg>
-
-                            <div class="photography">Oil</div>
+                    <button
+                        class={selectedOil ? "selected" : " "}
+                        on:click={() => createTag("Oil Painting")}
+                    >
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
                         </div>
-                    </a>
 
-                    <a href="" on:click={() => createTag("Ink Painting")}>
-                        <div class="kachel">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-82"
-                                    src="rectangle-82.png"
-                                />
-                            </div>
+                        <div class="photography3">Oil</div>
+                    </button>
 
-                            <svg
-                                class="_10-px-checkbox10"
-                                width="10"
-                                height="11"
-                                viewBox="0 0 10 11"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                    fill="#195DE6"
-                                />
-                            </svg>
-
-                            <div class="photography">Ink</div>
+                    <button
+                        class={selectedInk ? "selected" : " "}
+                        on:click={() => createTag("Ink Painting")}
+                    >
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
                         </div>
-                    </a>
 
-                    <a href="" on:click={() => createTag("Brush work")}>
-                        <div class="kachel">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-82"
-                                    src="rectangle-82.png"
-                                />
-                            </div>
+                        <div class="photography3">Ink</div>
+                    </button>
 
-                            <svg
-                                class="_10-px-checkbox11"
-                                width="10"
-                                height="11"
-                                viewBox="0 0 10 11"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                    fill="#195DE6"
-                                />
-                            </svg>
-
-                            <div class="photography">Brush</div>
+                    <button
+                        class={selectedBrush ? "selected" : " "}
+                        on:click={() => createTag("Brush Work")}
+                    >
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
                         </div>
-                    </a>
 
-                    <a href="" on:click={() => createTag("Graffiti")}>
-                        <div class="kachel">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-72"
-                                    src="rectangle-72.png"
-                                />
-                            </div>
+                        <div class="photography3">Brush</div>
+                    </button>
 
-                            <svg
-                                class="_10-px-checkbox12"
-                                width="10"
-                                height="11"
-                                viewBox="0 0 10 11"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                    fill="#195DE6"
-                                />
-                            </svg>
-
-                            <div class="photography">Graffiti</div>
+                    <button
+                        class={selectedGraffiti ? "selected" : " "}
+                        on:click={() => createTag("Graffiti")}
+                    >
+                        <div class="vorschau">
+                            <img class="rectangle-72" src="rectangle-72.png" />
                         </div>
-                    </a>
 
-                    <a
-                        href=""
+                        <div class="photography3">Graffiti</div>
+                    </button>
+
+                    <button
+                        class={selectedGouache ? "selected" : " "}
                         on:click={() => createTag("in the style of Gouache")}
                     >
-                        <div class="kachel">
-                            <div class="vorschau">
-                                <img class="airbrush" src="airbrush.png" />
-                            </div>
-
-                            <svg
-                                class="_10-px-checkbox13"
-                                width="10"
-                                height="11"
-                                viewBox="0 0 10 11"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                    fill="#195DE6"
-                                />
-                            </svg>
-
-                            <div class="photography">Gouache</div>
+                        <div class="vorschau">
+                            <img class="airbrush" src="abirbrush.png" />
                         </div>
-                    </a>
 
-                    <a
-                        href=""
+                        <div class="photography3">Gouache</div>
+                    </button>
+
+                    <button
+                        class={selectedWatercolor ? "selected" : " "}
                         on:click={() => createTag("Watercolor painting")}
                     >
-                        <div class="kachel2">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-82"
-                                    src="rectangle-82.png"
-                                />
-                            </div>
-
-                            <div class="text">
-                                <svg
-                                    class="_10-px-checkbox-checked-filled"
-                                    width="10"
-                                    height="10"
-                                    viewBox="0 0 10 10"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM4.375 6.71875L2.8125 5.16959L3.30963 4.6875L4.375 5.733L6.69022 3.4375L7.18766 3.93037L4.375 6.71875Z"
-                                        fill="#195DE6"
-                                    />
-                                </svg>
-
-                                <div class="photography2">Watercolor</div>
-                            </div>
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
                         </div>
-                    </a>
 
-                    <a href="" on:click={() => createTag("Airbrush work")}>
-                        <div class="kachel">
-                            <div class="vorschau">
-                                <img class="gouache" src="gouache.png" />
-                            </div>
+                        <div class="photography3">Watercolor</div>
+                    </button>
 
-                            <svg
-                                class="_10-px-checkbox14"
-                                width="10"
-                                height="11"
-                                viewBox="0 0 10 11"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                    fill="#195DE6"
-                                />
-                            </svg>
-
-                            <div class="photography">Airbrush</div>
+                    <button
+                        class={selectedAirbrush ? "selected" : " "}
+                        on:click={() => createTag("Airbrush work")}
+                    >
+                        <div class="vorschau">
+                            <img class="gouache" src="gouache.png" />
                         </div>
-                    </a>
 
-                    <a
-                        href=""
+                        <div class="photography3">Airbrush</div>
+                    </button>
+
+                    <button
+                        class={selectedAllaPrima ? "selected" : " "}
                         on:click={() => createTag("Alla Prima painting")}
                     >
-                        <div class="kachel2">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-82"
-                                    src="rectangle-82.png"
-                                />
-                            </div>
-
-                            <div class="text">
-                                <svg
-                                    class="_10-px-checkbox-checked-filled2"
-                                    width="10"
-                                    height="10"
-                                    viewBox="0 0 10 10"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM4.375 6.71875L2.8125 5.16959L3.30963 4.6875L4.375 5.733L6.69022 3.4375L7.18766 3.93037L4.375 6.71875Z"
-                                        fill="#195DE6"
-                                    />
-                                </svg>
-
-                                <div class="photography2">Alla Prima</div>
-                            </div>
+                        <div class="vorschau">
+                            <img class="gouache" src="gouache.png" />
                         </div>
-                    </a>
 
-                    <a
-                        href=""
+                        <div class="photography3">Alla Prima</div>
+                    </button>
+
+                    <button
+                        class={selectedPointilism ? "selected" : " "}
                         on:click={() => createTag("Pointilism painting")}
                     >
-                        <div class="kachel">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-82"
-                                    src="rectangle-82.png"
-                                />
-                            </div>
-
-                            <svg
-                                class="_10-px-checkbox15"
-                                width="10"
-                                height="11"
-                                viewBox="0 0 10 11"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                    fill="#195DE6"
-                                />
-                            </svg>
-
-                            <div class="photography">Pointilism</div>
+                        <div class="vorschau">
+                            <img class="gouache" src="gouache.png" />
                         </div>
-                    </a>
 
-                    <a href="" on:click={() => createTag("Impasto painting")}>
-                        <div class="kachel">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-82"
-                                    src="rectangle-82.png"
-                                />
-                            </div>
+                        <div class="photography3">Pointilism</div>
+                    </button>
 
-                            <svg
-                                class="_10-px-checkbox16"
-                                width="10"
-                                height="11"
-                                viewBox="0 0 10 11"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                    fill="#195DE6"
-                                />
-                            </svg>
-
-                            <div class="photography">Impasto</div>
+                    <button
+                        class={selectedImpasto ? "selected" : " "}
+                        on:click={() => createTag("Impasto painting")}
+                    >
+                        <div class="vorschau">
+                            <img class="gouache" src="gouache.png" />
                         </div>
-                    </a>
 
-                    <a href="" on:click={() => createTag("Stippling work")}>
-                        <div class="kachel">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-72"
-                                    src="rectangle-72.png"
-                                />
-                            </div>
+                        <div class="photography3">Impasto</div>
+                    </button>
 
-                            <svg
-                                class="_10-px-checkbox17"
-                                width="10"
-                                height="11"
-                                viewBox="0 0 10 11"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                    fill="#195DE6"
-                                />
-                            </svg>
-
-                            <div class="photography">Stippling</div>
+                    <button
+                        class={selectedStippling ? "selected" : " "}
+                        on:click={() => createTag("Stippling work")}
+                    >
+                        <div class="vorschau">
+                            <img class="gouache" src="gouache.png" />
                         </div>
-                    </a>
 
-                    <a href="" on:click={() => createTag("Chiaroscuro style")}>
-                        <div class="kachel">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-82"
-                                    src="rectangle-82.png"
-                                />
-                            </div>
+                        <div class="photography3">Stippling</div>
+                    </button>
 
-                            <svg
-                                class="_10-px-checkbox18"
-                                width="10"
-                                height="11"
-                                viewBox="0 0 10 11"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                    fill="#195DE6"
-                                />
-                            </svg>
-
-                            <div class="photography">Chiaroscuro</div>
+                    <button
+                        class={selectedChiaroscuro ? "selected" : " "}
+                        on:click={() => createTag("Chiaroscuro style")}
+                    >
+                        <div class="vorschau">
+                            <img class="gouache" src="gouache.png" />
                         </div>
-                    </a>
+
+                        <div class="photography3">Chiaroscuro</div>
+                    </button>
                 </div>
             </div>
 
@@ -1358,98 +1220,89 @@
                 <div class="medium2">Medium</div>
 
                 <div class="medium-frame">
-                    <a href="" on:click={() => addMedium("A photograph of ")}>
-                        <div class="kachel3">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-7"
-                                    src="rectangle-7.png"
-                                />
-                            </div>
-                            <div class="photography3">Photography</div>
+                    <button
+                        class={currentMedium === "A photograph of "
+                            ? "selected"
+                            : ""}
+                        on:click={() => addMedium("A photograph of ")}
+                    >
+                        <div class="vorschau">
+                            <img class="rectangle-7" src="rectangle-7.png" />
                         </div>
-                    </a>
+                        <div class="photography3">Photography</div>
+                    </button>
 
-                    <a href="" on:click={() => addMedium("A rendering of ")}>
-                        <div class="kachel3">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-82"
-                                    src="rectangle-82.png"
-                                />
-                            </div>
-
-                            <div class="photography3">Rendering</div>
+                    <button
+                        class={currentMedium === "A rendering of "
+                            ? "selected"
+                            : ""}
+                        on:click={() => addMedium("A rendering of ")}
+                    >
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
                         </div>
-                    </a>
+                        <div class="photography3">Rendering</div>
+                    </button>
 
-                    <a href="" on:click={() => addMedium("A painting of ")}>
-                        <div class="kachel3">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-72"
-                                    src="rectangle-72.png"
-                                />
-                            </div>
-
-                            <div class="photography4">Painting</div>
+                    <button
+                        class={currentMedium === "A painting of "
+                            ? "selected"
+                            : ""}
+                        on:click={() => addMedium("A painting of ")}
+                    >
+                        <div class="vorschau">
+                            <img class="rectangle-72" src="rectangle-72.png" />
                         </div>
-                    </a>
+                        <div class="photography3">Painting</div>
+                    </button>
 
-                    <a href="" on:click={() => addMedium("A drawing of ")}>
-                        <div class="kachel3">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-82"
-                                    src="rectangle-82.png"
-                                />
-                            </div>
-
-                            <div class="photography3">Drawing</div>
+                    <button
+                        class={currentMedium === "A drawing of "
+                            ? "selected"
+                            : ""}
+                        on:click={() => addMedium("A drawing of ")}
+                    >
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
                         </div>
-                    </a>
+                        <div class="photography3">Drawing</div>
+                    </button>
 
-                    <a href="" on:click={() => addMedium("A graphic of ")}>
-                        <div class="kachel3">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-82"
-                                    src="rectangle-82.png"
-                                />
-                            </div>
-
-                            <div class="photography3">Graphic</div>
+                    <button
+                        class={currentMedium === "A graphic of "
+                            ? "selected"
+                            : ""}
+                        on:click={() => addMedium("A graphic of ")}
+                    >
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
                         </div>
-                    </a>
+                        <div class="photography3">Graphic</div>
+                    </button>
 
-                    <a href="" on:click={() => addMedium("A print of ")}>
-                        <div class="kachel3">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-82"
-                                    src="rectangle-82.png"
-                                />
-                            </div>
-
-                            <div class="photography3">Print</div>
+                    <button
+                        class={currentMedium === "A print of "
+                            ? "selected"
+                            : ""}
+                        on:click={() => addMedium("A print of ")}
+                    >
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
                         </div>
-                    </a>
+                        <div class="photography3">Print</div>
+                    </button>
 
-                    <a
-                        href=""
+                    <button
+                        class={currentMedium === "A digital artwork of "
+                            ? "selected"
+                            : ""}
                         on:click={() => addMedium("A digital artwork of ")}
                     >
-                        <div class="kachel3">
-                            <div class="vorschau">
-                                <img
-                                    class="rectangle-82"
-                                    src="rectangle-82.png"
-                                />
-                            </div>
-
-                            <div class="photography3">Digital Art</div>
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
                         </div>
-                    </a>
+                        <div class="photography3">Digital Art</div>
+                    </button>
 
                     <div class="kachel5">
                         <div class="vorschau">
@@ -1479,10 +1332,10 @@
         </div>
 
         <!-- <div class="scroll-bar2">
-            <div class="rectangle-83" />
-
-            <div class="rectangle-92" />
-        </div> -->
+                <div class="rectangle-83" />
+    
+                <div class="rectangle-92" />
+            </div> -->
 
         <div class="search">
             <div class="search2">search...</div>
@@ -1506,6 +1359,32 @@
 
         <div class="tags4">Tags</div>
     </div>
+
+      <div class="history">
+        <div class="batches" id="batches">
+            <!-- <div class="batch-1" id="batch-1" /> -->
+        </div>
+
+        <!-- <div class="scroll-bar">
+                <div class="rectangle-8" />
+    
+                <div class="rectangle-9" />
+            </div> -->
+
+        <div class="history-title">
+            <div class="history-shadow" />
+
+            <div class="history-bg" />
+
+            <div class="history2">History</div>
+        </div>
+    </div>
+
+    <div class={blur ? "blur" : " "} />
+
+
+   
+
 
     <div class="top-bar">
         <div class="green-ellipse" />
@@ -1733,7 +1612,7 @@
 
     .result-container,
     .result-container * {
-        box-sizing: border-box;
+        /* box-sizing: border-box; */
     }
     .result-container {
         background: var(--white, #fafafa);
@@ -1744,10 +1623,10 @@
         align-items: center;
         justify-content: center;
 
-        box-shadow: var(
+        /* box-shadow: var(
             --shadow-kachel-box-shadow,
             0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
+        ); */
         overflow: hidden;
         position: absolute;
         left: 20px;
@@ -3294,8 +3173,6 @@
     .kachel3 {
         background: var(--bluebackground, #edeef3);
         border-radius: 6px;
-        border-color: var(--blueaccent, #195de5);
-        border-width: 1px;
         padding: 5px;
         display: flex;
         flex-direction: column;
@@ -3314,8 +3191,25 @@
         cursor: pointer;
     }
 
-    .kachel3:active,
-    .kachel3:focus {
+    .kachel3.active {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        align-items: flex-end;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+        cursor: pointer;
         outline: 2px solid var(--blue-accent, #195de5) !important;
     }
 
@@ -3597,4 +3491,86 @@
     :global(.bild:focus) {
         outline: 2px solid var(--blue-accent, #195de5) !important;
     }
+
+    button {
+        all: unset;
+        background: var(--bluebackground, #edeef3);
+        border-radius: 6px;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        align-items: flex-end;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    button2 {
+        color: var(--white, #fafafa);
+        background: var(--blueaccent, #195de5);
+        border-radius: 4px;
+        padding: 8px 12px 8px 12px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+        align-items: flex-start;
+        justify-content: center;
+        width: 290px;
+        position: absolute;
+        left: 447px;
+        top: 20px;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        border: none;
+        cursor: pointer;
+        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
+    }
+
+    .selected {
+        outline: 2px solid var(--blue-accent, #195de5) !important;
+    }
+
+    .grey {
+        background: var(--bluebackground, #edeef3);
+
+        color: var(--bluetext, #47536b);
+    }
+
+    .blur {
+        background: var(--bluetransparent, rgba(71, 83, 107, 0.2));
+        width: 1920px;
+        height: 1036px;
+        position: absolute;
+        left: 0px;
+        top: 44px;
+        backdrop-filter: blur(5px);
+        animation-duration: 4s;
+    }
+
+    buttonConf {
+        color: var(--blueaccent, #195de5);
+        text-align: left;
+        font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        cursor: pointer;
+    }
+
+
+    /* Pop-Up CSS Anfang */
+
+
 </style>
