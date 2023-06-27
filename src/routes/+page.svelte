@@ -4,7 +4,7 @@
     let userprompt = "";
     let result = "result_before.png";
     let imgHistory = [];
-    let steps = 20;
+    let steps = 5;
     let cfgScale = 7;
     let processing = false;
     let percentage = 0;
@@ -15,10 +15,17 @@
     let batch = [];
     let currentImgs = [];
     let batchCount = 0;
+    let width = 128;
+    let height = 128;
+    let batchesToGenerate = 1;
+    let batchSize = 4;
+    let negativePrompt = "";
+    let id = 0;
     // 172.17.11.23:7860
 
     function onKeyDown(e) {
         if (e.key === "Enter" || e.keyCode === 13) {
+            e.preventDefault();
             sendPrompt();
         }
     }
@@ -146,12 +153,12 @@
             seed_resize_from_h: -1,
             seed_resize_from_w: -1,
             sampler_name: "LMS",
-            batch_size: 4,
-            n_iter: 1,
+            batch_size: batchSize,
+            n_iter: batchesToGenerate,
             steps: steps,
             cfg_scale: cfgScale,
-            width: 128,
-            height: 128,
+            width: width,
+            height: height,
             restore_faces: false,
             tiling: false,
             do_not_save_samples: false,
@@ -208,6 +215,7 @@
         currentImgs.forEach((batch) => {
             let batchDiv = document.createElement("div");
             batchDiv.id = "batch" + batchCount;
+            batchDiv.classList.add("batch");
             batchDiv.style.display = "flex";
             batchDiv.style.padding = "6px";
             batchDiv.style.alignItems = "flex-start";
@@ -227,12 +235,12 @@
 
             batch.forEach((img) => {
                 let div = document.createElement("div");
-                div.classList.add("00009-1938723002");
                 div.id = "bild";
+                div.classList.add("bild");
                 div.innerHTML =
                     "<img src=" +
                     img +
-                    ' alt="" style="border-radius: 4px; flex-shrink: 0; width: 80px; height: 80px; position: relative;">';
+                    ' alt="" style="border-radius: 4px; flex-shrink: 0; width: 80px; height: 80px; position: relative;" on:click={console.log("hi")}>';
                 div.style.borderRadius = "4px";
                 div.style.flexShrink = "0";
                 div.style.width = "80px";
@@ -243,11 +251,20 @@
                 document.getElementById("batch" + batchCount).appendChild(div);
             });
             batchCount++;
+
+            // console.log(document.getElementsByClassName("bild")[0].innerHTML);
         });
     }
 
     if (browser) {
-      
+        const batchImagesContainer = document.querySelector(".batches");
+
+        batchImagesContainer.addEventListener("click", (event) => {
+            if (event.target instanceof Element) {
+                let clickedDiv = event.target;
+                result = clickedDiv.getAttribute("src");
+            }
+        });
     }
 </script>
 
@@ -360,17 +377,23 @@
         <div class="settings2">Settings</div>
 
         <div class="resolution">
-            <div class="input-field">
-                <div class="input">512px</div>
-            </div>
+            <input
+                class="input-field"
+                type="text"
+                placeholder="512"
+                bind:value={width}
+            />
 
-            <div class="input-field2">
-                <div class="input">512px</div>
-            </div>
+            <input
+                class="input-field2"
+                type="text"
+                placeholder="512"
+                bind:value={height}
+            />
 
             <div class="width">Width</div>
 
-            <div class="hight">Hight</div>
+            <div class="hight">Height</div>
 
             <div class="resolution2">Resolution</div>
         </div>
@@ -502,7 +525,7 @@
                     type="range"
                     min="1"
                     max="15"
-                    bind:value= {cfgScale}
+                    bind:value={cfgScale}
                     class="slider2"
                     id="CFGRange"
                 />
@@ -541,7 +564,6 @@
             </div>
 
             <div class="slider">
-
                 <input
                     type="range"
                     id="stepSlider"
@@ -577,13 +599,19 @@
         </div>
 
         <div class="batch">
-            <div class="input-field">
-                <div class="input">4</div>
-            </div>
+            <!-- <div class="input-field">4</div> -->
 
-            <div class="input-field2">
+            <input
+                class="input-field"
+                type="text"
+                bind:value={batchesToGenerate}
+            />
+
+            <input class="input-field2" type="text" bind:value={batchSize} />
+
+            <!-- <div class="input-field2">
                 <div class="input">1</div>
-            </div>
+            </div> -->
 
             <div class="count">Count</div>
 
@@ -659,7 +687,13 @@
         <div class="content">
             <div class="content2">Content</div>
 
-            <input
+            <!-- <input
+                bind:value={userprompt}
+                on:keydown={onKeyDown}
+                class="content-frame"
+            /> -->
+
+            <textarea
                 bind:value={userprompt}
                 on:keydown={onKeyDown}
                 class="content-frame"
@@ -1906,6 +1940,9 @@
         position: absolute;
         left: 0px;
         top: 22px;
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
     }
 
     .input {
@@ -1934,6 +1971,9 @@
         position: absolute;
         left: 0px;
         top: 50px;
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
     }
 
     .width {
@@ -2584,6 +2624,7 @@
     }
 
     .content-frame {
+        resize: none;
         color: var(--bluetext, #47536b);
         text-align: left;
         align-self: stretch;
