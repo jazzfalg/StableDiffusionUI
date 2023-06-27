@@ -10,7 +10,7 @@
     let percentage = 0;
     let time = "00:00:00";
     let rawprompt = "";
-    let medium = "A photograph of ";
+    let medium = "A painting of ";
     let tags = "";
     let batch = [];
     let currentImgs = [];
@@ -855,7 +855,7 @@
                 <div class="styles-kacheln">
                     <div class="kachel">
                         <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <img class="rectangle-82" src="cubism.png" />
                         </div>
 
                         <svg
@@ -877,7 +877,7 @@
 
                     <div class="kachel">
                         <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <img class="rectangle-82" src="surrealism.png" />
                         </div>
 
                         <svg
@@ -899,7 +899,7 @@
 
                     <div class="kachel">
                         <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <img class="rectangle-82" src="renaissance.png" />
                         </div>
 
                         <svg
@@ -921,7 +921,7 @@
 
                     <div class="kachel">
                         <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <img class="rectangle-82" src="popart.png" />
                         </div>
 
                         <svg
@@ -1114,7 +1114,7 @@
                         on:click={() => createTag("Oil Painting")}
                     >
                         <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <img class="rectangle-82" src="oil.png" />
                         </div>
 
                         <div class="photography3">Oil</div>
@@ -1125,7 +1125,7 @@
                         on:click={() => createTag("Ink Painting")}
                     >
                         <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <img class="rectangle-82" src="ink.png" />
                         </div>
 
                         <div class="photography3">Ink</div>
@@ -1136,7 +1136,7 @@
                         on:click={() => createTag("Brush Work")}
                     >
                         <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <img class="rectangle-82" src="brush.png" />
                         </div>
 
                         <div class="photography3">Brush</div>
@@ -1147,7 +1147,7 @@
                         on:click={() => createTag("Graffiti")}
                     >
                         <div class="vorschau">
-                            <img class="rectangle-72" src="rectangle-72.png" />
+                            <img class="rectangle-72" src="graffiti.png" />
                         </div>
 
                         <div class="photography3">Graffiti</div>
@@ -1158,7 +1158,7 @@
                         on:click={() => createTag("in the style of Gouache")}
                     >
                         <div class="vorschau">
-                            <img class="airbrush" src="abirbrush.png" />
+                            <img class="airbrush" src="gouache.png" />
                         </div>
 
                         <div class="photography3">Gouache</div>
@@ -1169,7 +1169,7 @@
                         on:click={() => createTag("Watercolor painting")}
                     >
                         <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <img class="rectangle-82" src="watercolor.png" />
                         </div>
 
                         <div class="photography3">Watercolor</div>
@@ -1180,7 +1180,7 @@
                         on:click={() => createTag("Airbrush work")}
                     >
                         <div class="vorschau">
-                            <img class="gouache" src="gouache.png" />
+                            <img class="gouache" src="airbrush.png" />
                         </div>
 
                         <div class="photography3">Airbrush</div>
@@ -1191,7 +1191,7 @@
                         on:click={() => createTag("Alla Prima painting")}
                     >
                         <div class="vorschau">
-                            <img class="gouache" src="gouache.png" />
+                            <img class="gouache" src="allaprima.png" />
                         </div>
 
                         <div class="photography3">Alla Prima</div>
@@ -1202,7 +1202,7 @@
                         on:click={() => createTag("Pointilism painting")}
                     >
                         <div class="vorschau">
-                            <img class="gouache" src="gouache.png" />
+                            <img class="gouache" src="pointilism.png" />
                         </div>
 
                         <div class="photography3">Pointilism</div>
@@ -1213,7 +1213,7 @@
                         on:click={() => createTag("Impasto painting")}
                     >
                         <div class="vorschau">
-                            <img class="gouache" src="gouache.png" />
+                            <img class="gouache" src="impasto.png" />
                         </div>
 
                         <div class="photography3">Impasto</div>
@@ -1224,7 +1224,7 @@
                         on:click={() => createTag("Stippling work")}
                     >
                         <div class="vorschau">
-                            <img class="gouache" src="gouache.png" />
+                            <img class="gouache" src="stippling.png" />
                         </div>
 
                         <div class="photography3">Stippling</div>
@@ -1235,7 +1235,7 @@
                         on:click={() => createTag("Chiaroscuro style")}
                     >
                         <div class="vorschau">
-                            <img class="gouache" src="gouache.png" />
+                            <img class="gouache" src="chiaroscuro.png" />
                         </div>
 
                         <div class="photography3">Chiaroscuro</div>
@@ -1254,7 +1254,7 @@
                         on:click={() => addMedium("A photograph of ")}
                     >
                         <div class="vorschau">
-                            <img class="rectangle-7" src="rectangle-7.png" />
+                            <img class="rectangle-7" src="photography.png" />
                         </div>
                         <div class="photography3">Photography</div>
                     </button>
@@ -1266,7 +1266,7 @@
                         on:click={() => addMedium("A rendering of ")}
                     >
                         <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <img class="rectangle-82" src="rendering.png" />
                         </div>
                         <div class="photography3">Rendering</div>
                     </button>
@@ -1278,7 +1278,7 @@
                         on:click={() => addMedium("A painting of ")}
                     >
                         <div class="vorschau">
-                            <img class="rectangle-72" src="rectangle-72.png" />
+                            <img class="rectangle-72" src="painting.png" />
                         </div>
                         <div class="photography3">Painting</div>
                     </button>
@@ -1290,7 +1290,7 @@
                         on:click={() => addMedium("A drawing of ")}
                     >
                         <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <img class="rectangle-82" src="drawing.png" />
                         </div>
                         <div class="photography3">Drawing</div>
                     </button>
@@ -1302,7 +1302,7 @@
                         on:click={() => addMedium("A graphic of ")}
                     >
                         <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <img class="rectangle-82" src="graphic.png" />
                         </div>
                         <div class="photography3">Graphic</div>
                     </button>
@@ -1314,7 +1314,7 @@
                         on:click={() => addMedium("A print of ")}
                     >
                         <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <img class="rectangle-82" src="print.png" />
                         </div>
                         <div class="photography3">Print</div>
                     </button>
@@ -1326,7 +1326,7 @@
                         on:click={() => addMedium("A digital artwork of ")}
                     >
                         <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <img class="rectangle-82" src="digitalart.png" />
                         </div>
                         <div class="photography3">Digital Art</div>
                     </button>
