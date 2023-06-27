@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        input {
+            display: none;
+        }
+
+        label {
+            display: block;
+        }
+
+        input+div {
+            background: orange;
+        }
+
+        input:checked+div {
+            background: red;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="radio" id="one" name="test" value="ONE">
+    <div><label for="one">ONE</label></div>
+
+    <input type="radio" id="two" name="test" value="TWO">
+    <div><label for="two">TWO</label></div>
+
+    <input type="radio" id="three" name="test" value="THREE">
+    <div><label for="three">THREE</label></div>
+</body>
+
+</html>

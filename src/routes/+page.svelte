@@ -10,7 +10,9 @@
     let rawprompt = "";
     let medium = "";
     let tags = "";
-
+    let batch = [];
+    let currentImgs = [];
+    let batchCount = 0;
     // 172.17.11.23:7860
 
     function onKeyDown(e) {
@@ -19,13 +21,34 @@
         }
     }
 
-    setInterval(function () {rawprompt = medium + userprompt + tags}, 0);
+    function createTag(tag) {
 
-    // function addMedium(add)
-    // {
-    //     rawprompt = add += userprompt ;
+        if(rawprompt.substring(tag))
+        return;
+        
+        let div = document.createElement("div");
+        div.id = tag;
+        div.classList.add("tag");
+        // div.className = "tag";
+        div.innerHTML = '<img src="close--filled.png" alt="">' + tag;
+        div.style.display = "flex";
+        div.style.padding = "4px 6px";
+        div.style.alignItems = "center";
+        div.style.gap = "6px";
+        div.style.color = "#FAFAFA";
+        div.style.borderRadius = "3px";
+        div.style.background = "#195DE5";
+        div.style.fontSize = "11px";
+        div.style.fontFamily = "IBM Plex Sans";
 
-    // }
+        tags += ", " + tag;
+
+        document.getElementById("tag-frame").appendChild(div);
+    }
+
+    setInterval(function () {
+        rawprompt = medium + userprompt + tags;
+    }, 0);
 
     async function sendPrompt() {
         if (processing) return;
@@ -59,14 +82,28 @@
             .then((res) => res.json())
             .then((data) => {
                 processing = false;
-                console.log(data);
+                currentImgs = [];
                 var image = new Image();
                 image.src = "data:image/png;base64," + data["images"][0];
+                // console.log("Image.src" + image.src);
                 result = image.src;
                 percentage = 100;
                 time = "00:00:00";
 
-                imgHistory.push(image);
+                batch = [];
+                data["images"].forEach((element) => {
+                    batch.push("data:image/png;base64," + element);
+                    localStorage.setItem(
+                        "imgData",
+                        "data:image/png;base64," + element
+                    );
+                });
+                imgHistory.push(batch);
+                currentImgs.push(batch);
+
+                addToHistory(currentImgs);
+
+                document.getElementById("progressBar").style.width = 100 + "%";
             })
             .catch((err) => console.log(err));
     }
@@ -94,9 +131,9 @@
             seed_resize_from_h: -1,
             seed_resize_from_w: -1,
             sampler_name: "LMS",
-            batch_size: 1,
+            batch_size: 4,
             n_iter: 1,
-            steps: 20,
+            steps: 2,
             cfg_scale: 7,
             width: 128,
             height: 128,
@@ -136,108 +173,84 @@
         )
             .then((res) => res.json())
             .then((data) => {
-                console.log(data);
+                // console.log(data);
                 percentage = Math.round(data.progress * 100);
-                time = new Date(data.eta_relative * 1000).toISOString().slice(11, 19);
+                time = new Date(data.eta_relative * 1000)
+                    .toISOString()
+                    .slice(11, 19);
                 var currentImage = new Image();
-                currentImage.src ="data:image/png;base64," + data["current_image"];
-                if(data["current_image"] != null)
-                result = currentImage.src;
+                currentImage.src =
+                    "data:image/png;base64," + data["current_image"];
+                if (data["current_image"] != null) result = currentImage.src;
+
+                document.getElementById("progressBar").style.width =
+                    percentage + "%";
             })
             .catch((err) => console.log(err));
+    }
+
+    function addToHistory(currentImgs) {
+
+        currentImgs.forEach((batch) => {
+            let batchDiv = document.createElement("div");
+            batchDiv.id = "batch" + batchCount;
+            batchDiv.style.display = "flex";
+            batchDiv.style.padding = "6px";
+            batchDiv.style.alignItems = "flex-start";
+            // batchDiv.style.alignContent = "flex-start";
+            batchDiv.style.gap = "6px";
+            batchDiv.style.flexWrap = "wrap";
+            batchDiv.style.borderRadius = "10px";
+            batchDiv.style.background = "#d1dffa";
+            batchDiv.style.boxShadow = "0px 2px 3px 0px rgba(31, 37, 71, 0.25)";
+
+
+//             display: flex;
+// padding: 6px;
+// align-items: flex-start;
+// gap: 6px;
+
+            document.getElementById("batches").appendChild(batchDiv);
+
+            batch.forEach((img) => {
+                let div = document.createElement("div");
+                div.classList.add("00009-1938723002");
+                div.id = "bild";
+                div.innerHTML =
+                    "<img src=" +
+                    img +
+                    ' alt="" style="border-radius: 4px; flex-shrink: 0; width: 80px; height: 80px; position: relative;">';
+                div.style.borderRadius = "4px";
+                div.style.flexShrink = "0";
+                div.style.width = "80px";
+                div.style.height = "80px";
+                div.style.position = "relative";
+                div.style.cursor = "pointer";
+
+                document.getElementById("batch" + batchCount).appendChild(div);
+            });
+            batchCount++;
+        });
+
+        // let div = document.createElement("div");
+        // div.id = "bild";
+        // div.innerHTML = '<img src=result_before.png alt="">';
+
+        // document.getElementById("batch-1").appendChild(div);
     }
 </script>
 
 <div class="main">
     <div class="history">
-        <div class="batches">
-            <div class="batch-1">
-                <img class="_00009-1938723002" src="_00009-1938723002.png" />
-
-                <img class="_00014-446255131" src="_00014-446255131.png" />
-
-                <img class="_00012-3684755115" src="_00012-3684755115.png" />
-
-                <img
-                    class="_00013-3684755116-6"
-                    src="_00013-3684755116-6.png"
-                />
-            </div>
-
-            <div class="batch-2">
-                <img class="_00009-446255139" src="_00009-446255139.png" />
-
-                <img class="_00010-446255140" src="_00010-446255140.png" />
-
-                <img class="_00011-446255141" src="_00011-446255141.png" />
-
-                <img class="_00012-446255142" src="_00012-446255142.png" />
-            </div>
-
-            <div class="batch-3">
-                <img class="_00013-446255143" src="_00013-446255143.png" />
-
-                <img class="_00014-446255144" src="_00014-446255144.png" />
-
-                <img class="_00015-446255145" src="_00015-446255145.png" />
-
-                <img class="_00016-446255146" src="_00016-446255146.png" />
-            </div>
-
-            <div class="batch-4">
-                <div class="frame-31">
-                    <img
-                        class="_00005-3807344773"
-                        src="_00005-3807344773.png"
-                    />
-
-                    <img
-                        class="_00004-3807344772"
-                        src="_00004-3807344772.png"
-                    />
-
-                    <img class="_00015-446255132" src="_00015-446255132.png" />
-
-                    <img class="_00016-446255133" src="_00016-446255133.png" />
-                </div>
-
-                <div class="frame-30">
-                    <img
-                        class="_00007-1938723000"
-                        src="_00007-1938723000.png"
-                    />
-
-                    <img
-                        class="_00003-3807344771"
-                        src="_00003-3807344771.png"
-                    />
-                </div>
-            </div>
-
-            <div class="batch-5">
-                <img class="_00001-1445990440" src="_00001-1445990440.png" />
-
-                <img class="_00010-3684755113" src="_00010-3684755113.png" />
-
-                <img class="_00017-446255134" src="_00017-446255134.png" />
-            </div>
-
-            <div class="batch-6">
-                <img class="_00011-3684755114" src="_00011-3684755114.png" />
-
-                <img class="_00002-3807344770" src="_00002-3807344770.png" />
-
-                <img class="_00006-1938722999" src="_00006-1938722999.png" />
-
-                <img class="_00008-1938723001" src="_00008-1938723001.png" />
-            </div>
+        <div class="batches" id="batches">
+            <!-- <div class="batch-1" id="batch-1" /> -->
         </div>
 
-        <div class="scroll-bar">
+        <!-- <div class="scroll-bar">
             <div class="rectangle-8" />
 
             <div class="rectangle-9" />
-        </div>
+        </div> -->
 
         <div class="history-title">
             <div class="history-shadow" />
@@ -299,7 +312,7 @@
             </div>
         </div>
 
-        <div class="result2">
+        <div class="result-container">
             <img class="_00013-3684755116-1" src={result} />
         </div>
 
@@ -307,7 +320,7 @@
             <div class="progress-bar">
                 <div class="rectangle-38" />
 
-                <div class="rectangle-39" />
+                <div class="rectangle-39" id="progressBar" />
             </div>
 
             <div class="progress-100">Progress: {percentage}%</div>
@@ -384,7 +397,7 @@
                     fill="#47536B"
                 />
                 <path
-                    d="M6.00015 9.45C6.33152 9.45 6.60015 9.18137 6.60015 8.85C6.60015 8.51863 6.33152 8.25 6.00015 8.25C5.66878 8.25 5.40015 8.51863 5.40015 8.85C5.40015 9.18137 5.66878 9.45 6.00015 9.45Z"
+                    d="M6.00039 9.45C6.33176 9.45 6.60039 9.18137 6.60039 8.85C6.60039 8.51863 6.33176 8.25 6.00039 8.25C5.66902 8.25 5.40039 8.51863 5.40039 8.85C5.40039 9.18137 5.66902 9.45 6.00039 9.45Z"
                     fill="#47536B"
                 />
                 <path
@@ -425,7 +438,7 @@
                     fill="#47536B"
                 />
                 <path
-                    d="M6.00015 9.45C6.33152 9.45 6.60015 9.18137 6.60015 8.85C6.60015 8.51863 6.33152 8.25 6.00015 8.25C5.66878 8.25 5.40015 8.51863 5.40015 8.85C5.40015 9.18137 5.66878 9.45 6.00015 9.45Z"
+                    d="M6.00039 9.45C6.33176 9.45 6.60039 9.18137 6.60039 8.85C6.60039 8.51863 6.33176 8.25 6.00039 8.25C5.66902 8.25 5.40039 8.51863 5.40039 8.85C5.40039 9.18137 5.66902 9.45 6.00039 9.45Z"
                     fill="#47536B"
                 />
                 <path
@@ -455,7 +468,7 @@
                     fill="#47536B"
                 />
                 <path
-                    d="M6.00015 9.45C6.33152 9.45 6.60015 9.18137 6.60015 8.85C6.60015 8.51863 6.33152 8.25 6.00015 8.25C5.66878 8.25 5.40015 8.51863 5.40015 8.85C5.40015 9.18137 5.66878 9.45 6.00015 9.45Z"
+                    d="M6.00039 9.45C6.33176 9.45 6.60039 9.18137 6.60039 8.85C6.60039 8.51863 6.33176 8.25 6.00039 8.25C5.66902 8.25 5.40039 8.51863 5.40039 8.85C5.40039 9.18137 5.66902 9.45 6.00039 9.45Z"
                     fill="#47536B"
                 />
                 <path
@@ -491,7 +504,7 @@
                     fill="#47536B"
                 />
                 <path
-                    d="M6.00015 9.45C6.33152 9.45 6.60015 9.18137 6.60015 8.85C6.60015 8.51863 6.33152 8.25 6.00015 8.25C5.66878 8.25 5.40015 8.51863 5.40015 8.85C5.40015 9.18137 5.66878 9.45 6.00015 9.45Z"
+                    d="M6.00039 9.45C6.33176 9.45 6.60039 9.18137 6.60039 8.85C6.60039 8.51863 6.33176 8.25 6.00039 8.25C5.66902 8.25 5.40039 8.51863 5.40039 8.85C5.40039 9.18137 5.66902 9.45 6.00039 9.45Z"
                     fill="#47536B"
                 />
                 <path
@@ -527,7 +540,7 @@
                     fill="#47536B"
                 />
                 <path
-                    d="M6.00015 9.45C6.33152 9.45 6.60015 9.18137 6.60015 8.85C6.60015 8.51863 6.33152 8.25 6.00015 8.25C5.66878 8.25 5.40015 8.51863 5.40015 8.85C5.40015 9.18137 5.66878 9.45 6.00015 9.45Z"
+                    d="M6.00039 9.45C6.33176 9.45 6.60039 9.18137 6.60039 8.85C6.60039 8.51863 6.33176 8.25 6.00039 8.25C5.66902 8.25 5.40039 8.51863 5.40039 8.85C5.40039 9.18137 5.66902 9.45 6.00039 9.45Z"
                     fill="#47536B"
                 />
                 <path
@@ -565,7 +578,7 @@
                     fill="#47536B"
                 />
                 <path
-                    d="M6.00015 9.45C6.33152 9.45 6.60015 9.18137 6.60015 8.85C6.60015 8.51863 6.33152 8.25 6.00015 8.25C5.66878 8.25 5.40015 8.51863 5.40015 8.85C5.40015 9.18137 5.66878 9.45 6.00015 9.45Z"
+                    d="M6.00039 9.45C6.33176 9.45 6.60039 9.18137 6.60039 8.85C6.60039 8.51863 6.33176 8.25 6.00039 8.25C5.66902 8.25 5.40039 8.51863 5.40039 8.85C5.40039 9.18137 5.66902 9.45 6.00039 9.45Z"
                     fill="#47536B"
                 />
                 <path
@@ -594,7 +607,7 @@
 
             <div class="rawprompt-frame">
                 <div class="negative-prompt-text">
-                   {rawprompt}
+                    {rawprompt}
                 </div>
             </div>
 
@@ -602,178 +615,7 @@
         </div>
 
         <div class="tags">
-            <div class="tag-frame">
-                <div class="tag">
-                    <div class="frame-19">
-                        <svg
-                            class="_8-px-close-filled"
-                            width="8"
-                            height="8"
-                            viewBox="0 0 8 8"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M4 0.5C2.05 0.5 0.5 2.05 0.5 4C0.5 5.95 2.05 7.5 4 7.5C5.95 7.5 7.5 5.95 7.5 4C7.5 2.05 5.95 0.5 4 0.5ZM5.35 5.75L4 4.4L2.65 5.75L2.25 5.35L3.6 4L2.25 2.65L2.65 2.25L4 3.6L5.35 2.25L5.75 2.65L4.4 4L5.75 5.35L5.35 5.75Z"
-                                fill="#FAFAFA"
-                            />
-                        </svg>
-
-                        <div class="tag2">Painting</div>
-                    </div>
-
-                    <div class="frame-20">
-                        <svg
-                            class="_8-px-subtract"
-                            width="8"
-                            height="8"
-                            viewBox="0 0 8 8"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
-                                fill="#FAFAFA"
-                            />
-                            <path d="M2 3.75H6V4.25H2V3.75Z" fill="#FAFAFA" />
-                        </svg>
-
-                        <div class="_1-0">1,0</div>
-
-                        <svg
-                            class="_8-px-add"
-                            width="8"
-                            height="8"
-                            viewBox="0 0 8 8"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
-                                fill="#FAFAFA"
-                            />
-                            <path
-                                d="M6 3.75H4.25V2H3.75V3.75H2V4.25H3.75V6H4.25V4.25H6V3.75Z"
-                                fill="#FAFAFA"
-                            />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="tag">
-                    <div class="frame-19">
-                        <svg
-                            class="_8-px-close-filled2"
-                            width="8"
-                            height="8"
-                            viewBox="0 0 8 8"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M4 0.5C2.05 0.5 0.5 2.05 0.5 4C0.5 5.95 2.05 7.5 4 7.5C5.95 7.5 7.5 5.95 7.5 4C7.5 2.05 5.95 0.5 4 0.5ZM5.35 5.75L4 4.4L2.65 5.75L2.25 5.35L3.6 4L2.25 2.65L2.65 2.25L4 3.6L5.35 2.25L5.75 2.65L4.4 4L5.75 5.35L5.35 5.75Z"
-                                fill="#FAFAFA"
-                            />
-                        </svg>
-
-                        <div class="tag2">Watercolor</div>
-                    </div>
-
-                    <div class="frame-20">
-                        <svg
-                            class="_8-px-subtract2"
-                            width="8"
-                            height="8"
-                            viewBox="0 0 8 8"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
-                                fill="#FAFAFA"
-                            />
-                            <path d="M2 3.75H6V4.25H2V3.75Z" fill="#FAFAFA" />
-                        </svg>
-
-                        <div class="_1-0">0,3</div>
-
-                        <svg
-                            class="_8-px-add2"
-                            width="8"
-                            height="8"
-                            viewBox="0 0 8 8"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
-                                fill="#FAFAFA"
-                            />
-                            <path
-                                d="M6 3.75H4.25V2H3.75V3.75H2V4.25H3.75V6H4.25V4.25H6V3.75Z"
-                                fill="#FAFAFA"
-                            />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="tag">
-                    <div class="frame-19">
-                        <svg
-                            class="_8-px-close-filled3"
-                            width="8"
-                            height="8"
-                            viewBox="0 0 8 8"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M4 0.5C2.05 0.5 0.5 2.05 0.5 4C0.5 5.95 2.05 7.5 4 7.5C5.95 7.5 7.5 5.95 7.5 4C7.5 2.05 5.95 0.5 4 0.5ZM5.35 5.75L4 4.4L2.65 5.75L2.25 5.35L3.6 4L2.25 2.65L2.65 2.25L4 3.6L5.35 2.25L5.75 2.65L4.4 4L5.75 5.35L5.35 5.75Z"
-                                fill="#FAFAFA"
-                            />
-                        </svg>
-
-                        <div class="tag2">Alla Prima</div>
-                    </div>
-
-                    <div class="frame-20">
-                        <svg
-                            class="_8-px-subtract3"
-                            width="8"
-                            height="8"
-                            viewBox="0 0 8 8"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
-                                fill="#FAFAFA"
-                            />
-                            <path d="M2 3.75H6V4.25H2V3.75Z" fill="#FAFAFA" />
-                        </svg>
-
-                        <div class="_1-0">1,2</div>
-
-                        <svg
-                            class="_8-px-add3"
-                            width="8"
-                            height="8"
-                            viewBox="0 0 8 8"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M4 1C5.65 1 7 2.35 7 4C7 5.65 5.65 7 4 7C2.35 7 1 5.65 1 4C1 2.35 2.35 1 4 1ZM4 0.5C2.075 0.5 0.5 2.075 0.5 4C0.5 5.925 2.075 7.5 4 7.5C5.925 7.5 7.5 5.925 7.5 4C7.5 2.075 5.925 0.5 4 0.5Z"
-                                fill="#FAFAFA"
-                            />
-                            <path
-                                d="M6 3.75H4.25V2H3.75V3.75H2V4.25H3.75V6H4.25V4.25H6V3.75Z"
-                                fill="#FAFAFA"
-                            />
-                        </svg>
-                    </div>
-                </div>
-            </div>
+            <div class="tag-frame" id="tag-frame" />
 
             <div class="tags2">Tags</div>
         </div>
@@ -796,12 +638,7 @@
                 on:keydown={onKeyDown}
                 class="content-frame"
             />
-
-            <!-- <div class="content-frame">
-                <div class="prompt-text">What should be on the image?</div>
-            </div> -->
         </div>
-
         <div class="prompt2">Prompt</div>
     </div>
 
@@ -1104,49 +941,53 @@
             <div class="divider3" />
 
             <div class="techniques-kacheln">
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
+                <a href="" on:click={() => createTag("Oil")}>
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
+
+                        <svg
+                            class="_10-px-checkbox9"
+                            width="10"
+                            height="11"
+                            viewBox="0 0 10 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
+
+                        <div class="photography">Oil</div>
                     </div>
+                </a>
 
-                    <svg
-                        class="_10-px-checkbox9"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
+                <a href="" on:click={() => createTag("ink painting")}>
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
 
-                    <div class="photography">Oil</div>
-                </div>
+                        <svg
+                            class="_10-px-checkbox10"
+                            width="10"
+                            height="11"
+                            viewBox="0 0 10 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
 
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
+                        <div class="photography">Ink</div>
                     </div>
-
-                    <svg
-                        class="_10-px-checkbox10"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
-
-                    <div class="photography">Ink</div>
-                </div>
+                </a>
 
                 <div class="kachel">
                     <div class="vorschau">
@@ -1229,7 +1070,7 @@
                             xmlns="http://www.w3.org/2000/svg"
                         >
                             <path
-                                d="M8.12503 1.25H1.87503C1.70927 1.25 1.5503 1.31585 1.43309 1.43306C1.31588 1.55027 1.25003 1.70924 1.25003 1.875V8.125C1.25003 8.29076 1.31588 8.44973 1.43309 8.56694C1.5503 8.68415 1.70927 8.75 1.87503 8.75H8.12503C8.29079 8.75 8.44976 8.68415 8.56697 8.56694C8.68418 8.44973 8.75003 8.29076 8.75003 8.125V1.875C8.75003 1.70924 8.68418 1.55027 8.56697 1.43306C8.44976 1.31585 8.29079 1.25 8.12503 1.25V1.25ZM4.37503 6.71875L2.81253 5.16959L3.30966 4.6875L4.37503 5.733L6.69025 3.4375L7.18769 3.93037L4.37503 6.71875Z"
+                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM4.375 6.71875L2.8125 5.16959L3.30963 4.6875L4.375 5.733L6.69022 3.4375L7.18766 3.93037L4.375 6.71875Z"
                                 fill="#195DE6"
                             />
                         </svg>
@@ -1275,7 +1116,7 @@
                             xmlns="http://www.w3.org/2000/svg"
                         >
                             <path
-                                d="M8.12503 1.25H1.87503C1.70927 1.25 1.5503 1.31585 1.43309 1.43306C1.31588 1.55027 1.25003 1.70924 1.25003 1.875V8.125C1.25003 8.29076 1.31588 8.44973 1.43309 8.56694C1.5503 8.68415 1.70927 8.75 1.87503 8.75H8.12503C8.29079 8.75 8.44976 8.68415 8.56697 8.56694C8.68418 8.44973 8.75003 8.29076 8.75003 8.125V1.875C8.75003 1.70924 8.68418 1.55027 8.56697 1.43306C8.44976 1.31585 8.29079 1.25 8.12503 1.25V1.25ZM4.37503 6.71875L2.81253 5.16959L3.30966 4.6875L4.37503 5.733L6.69025 3.4375L7.18769 3.93037L4.37503 6.71875Z"
+                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM4.375 6.71875L2.8125 5.16959L3.30963 4.6875L4.375 5.733L6.69022 3.4375L7.18766 3.93037L4.375 6.71875Z"
                                 fill="#195DE6"
                             />
                         </svg>
@@ -1377,24 +1218,16 @@
         <div class="medium">
             <div class="medium2">Medium</div>
 
-            <div class="mediumkacheln">
-                <button class="kachel3" on:click={() => medium = "A photograph of "}>
+            <div class="medium-frame">
+                <div class="kachel3">
                     <div class="vorschau">
                         <img class="rectangle-7" src="rectangle-7.png" />
                     </div>
 
                     <div class="photography3">Photography</div>
-                </button>
-
-                <div class="kachel4">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
-                    </div>
-
-                    <div class="photography3">Graphic</div>
                 </div>
 
-                <div class="kachel5">
+                <div class="kachel3">
                     <div class="vorschau">
                         <img class="rectangle-82" src="rectangle-82.png" />
                     </div>
@@ -1402,15 +1235,7 @@
                     <div class="photography3">Rendering</div>
                 </div>
 
-                <div class="kachel6">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
-                    </div>
-
-                    <div class="photography3">Print</div>
-                </div>
-
-                <div class="kachel7">
+                <div class="kachel3">
                     <div class="vorschau">
                         <img class="rectangle-72" src="rectangle-72.png" />
                     </div>
@@ -1418,7 +1243,31 @@
                     <div class="photography4">Painting</div>
                 </div>
 
-                <div class="kachel8">
+                <div class="kachel3">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <div class="photography3">Drawing</div>
+                </div>
+
+                <div class="kachel3">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <div class="photography3">Graphic</div>
+                </div>
+
+                <div class="kachel3">
+                    <div class="vorschau">
+                        <img class="rectangle-82" src="rectangle-82.png" />
+                    </div>
+
+                    <div class="photography3">Print</div>
+                </div>
+
+                <div class="kachel3">
                     <div class="vorschau">
                         <img class="rectangle-82" src="rectangle-82.png" />
                     </div>
@@ -1426,35 +1275,27 @@
                     <div class="photography3">Digital Art</div>
                 </div>
 
-                <div class="kachel9">
+                <div class="kachel5">
                     <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
+                        <img class="rectangle-73" src="rectangle-73.png" />
                     </div>
 
-                    <div class="photography3">Drawing</div>
+                    <div class="new-idea">New Idea</div>
+
+                    <svg
+                        class="_32-px-add-filled"
+                        width="32"
+                        height="32"
+                        viewBox="0 0 32 32"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M16 2C12.3009 2.04476 8.76586 3.53412 6.14999 6.14999C3.53412 8.76586 2.04476 12.3009 2 16C2.04476 19.6991 3.53412 23.2341 6.14999 25.85C8.76586 28.4659 12.3009 29.9552 16 30C19.6991 29.9552 23.2341 28.4659 25.85 25.85C28.4659 23.2341 29.9552 19.6991 30 16C29.9552 12.3009 28.4659 8.76586 25.85 6.14999C23.2341 3.53412 19.6991 2.04476 16 2V2ZM24 17H17V24H15V17H8V15H15V8H17V15H24V17Z"
+                            fill="#FAFAFA"
+                        />
+                    </svg>
                 </div>
-            </div>
-
-            <div class="kachel10">
-                <div class="vorschau">
-                    <img class="rectangle-73" src="rectangle-73.png" />
-                </div>
-
-                <div class="new-idea">New Idea</div>
-
-                <svg
-                    class="_32-px-add-filled"
-                    width="32"
-                    height="32"
-                    viewBox="0 0 32 32"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M16 2C12.3009 2.04476 8.76586 3.53412 6.14999 6.14999C3.53412 8.76586 2.04476 12.3009 2 16C2.04476 19.6991 3.53412 23.2341 6.14999 25.85C8.76586 28.4659 12.3009 29.9552 16 30C19.6991 29.9552 23.2341 28.4659 25.85 25.85C28.4659 23.2341 29.9552 19.6991 30 16C29.9552 12.3009 28.4659 8.76586 25.85 6.14999C23.2341 3.53412 19.6991 2.04476 16 2V2ZM24 17H17V24H15V17H8V15H15V8H17V15H24V17Z"
-                        fill="#FAFAFA"
-                    />
-                </svg>
             </div>
 
             <div class="medium-devider" />
@@ -1480,7 +1321,7 @@
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <path
-                    d="M9.37501 8.93751L6.68751 6.25001C7.87501 4.81251 7.68751 2.62501 6.25001 1.43751C4.81251 0.250009 2.62501 0.437509 1.43751 1.87501C0.250009 3.31251 0.437509 5.50001 1.87501 6.68751C3.12501 7.75001 5.00001 7.75001 6.25001 6.68751L8.93751 9.37501L9.37501 8.93751ZM1.25001 4.06251C1.25001 2.50001 2.50001 1.25001 4.06251 1.25001C5.62501 1.25001 6.87501 2.50001 6.87501 4.06251C6.87501 5.62501 5.62501 6.87501 4.06251 6.87501C2.50001 6.87501 1.25001 5.62501 1.25001 4.06251Z"
+                    d="M9.37525 8.93751L6.68775 6.25001C7.87525 4.81251 7.68775 2.62501 6.25025 1.43751C4.81275 0.250009 2.62525 0.437509 1.43775 1.87501C0.250253 3.31251 0.437753 5.50001 1.87525 6.68751C3.12525 7.75001 5.00025 7.75001 6.25025 6.68751L8.93775 9.37501L9.37525 8.93751ZM1.25025 4.06251C1.25025 2.50001 2.50025 1.25001 4.06275 1.25001C5.62525 1.25001 6.87525 2.50001 6.87525 4.06251C6.87525 5.62501 5.62525 6.87501 4.06275 6.87501C2.50025 6.87501 1.25025 5.62501 1.25025 4.06251Z"
                     fill="#47536B"
                 />
             </svg>
@@ -1537,32 +1378,51 @@
     }
 
     .batches {
-        padding: 13px 0px 13px 0px;
+        /* padding: 13px 0px 13px 0px; */
         display: flex;
-        flex-direction: column;
+
         gap: 16px;
         align-items: flex-start;
-        justify-content: flex-start;
         position: absolute;
         left: 20px;
         top: 102px;
+        display: inline-flex;
+        height: 874px;
+       
+        align-items: flex-start;
+        gap: 16px;
+        flex-shrink: 0;
+        display: inline-flex;
+        height: 874px;
+        /* padding: 16px 0px; */
+  
+        align-items: flex-start;
+        gap: 16px;
+        flex-shrink: 0;
+
+        display: flex;
+        width: 372px;
+        padding: 13px 22px 13px 0px;
+        align-items: flex-start;
+        align-content: flex-start;
+        gap: 16px;
+        flex-wrap: wrap;
+        overflow-y: scroll;
     }
 
     .batch-1 {
-        background: var(--blueaccent-light, #d1dffa);
-        border-radius: 10px;
-        padding: 6px;
         display: flex;
-        flex-direction: row;
-        gap: 6px;
+        width: 350px;
+        padding: 6px;
         align-items: flex-start;
-        justify-content: flex-start;
-        flex-shrink: 0;
-        position: relative;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
+        align-content: flex-start;
+        gap: 6px;
+        flex-wrap: wrap;
+        border-radius: 10px;
+        background: var(--blue-accent-light, #d1dffa);
+
+        /* shadow_kachel */
+        box-shadow: 0px 2px 3px 0px rgba(31, 37, 71, 0.25);
     }
 
     ._00009-1938723002 {
@@ -1594,279 +1454,6 @@
         border-style: solid;
         border-color: var(--blueaccent, #195de5);
         border-width: 2px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    .batch-2 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 10px;
-        padding: 6px;
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        flex-shrink: 0;
-        position: relative;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-    }
-
-    ._00009-446255139 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00010-446255140 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00011-446255141 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00012-446255142 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    .batch-3 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 10px;
-        padding: 6px;
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        flex-shrink: 0;
-        position: relative;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-    }
-
-    ._00013-446255143 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00014-446255144 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00015-446255145 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00016-446255146 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    .batch-4 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 10px;
-        padding: 6px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        flex-shrink: 0;
-        position: relative;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-    }
-
-    .frame-31 {
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        flex-shrink: 0;
-        position: relative;
-    }
-
-    ._00005-3807344773 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00004-3807344772 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00015-446255132 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00016-446255133 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    .frame-30 {
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        flex-shrink: 0;
-        position: relative;
-    }
-
-    ._00007-1938723000 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00003-3807344771 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    .batch-5 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 10px;
-        padding: 6px;
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        flex-shrink: 0;
-        position: relative;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-    }
-
-    ._00001-1445990440 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00010-3684755113 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00017-446255134 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    .batch-6 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 10px;
-        padding: 6px;
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        flex-shrink: 0;
-        position: relative;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-    }
-
-    ._00011-3684755114 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00002-3807344770 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00006-1938722999 {
-        border-radius: 4px;
-        flex-shrink: 0;
-        width: 80px;
-        height: 80px;
-        position: relative;
-    }
-
-    ._00008-1938723001 {
-        border-radius: 4px;
         flex-shrink: 0;
         width: 80px;
         height: 80px;
@@ -1960,6 +1547,36 @@
         );
     }
 
+    ._00013-3684755116-1 {
+        flex-shrink: 0;
+        width: 606px;
+        height: 606px;
+        position: relative;
+    }
+
+    .result-container,
+    .result-container * {
+        box-sizing: border-box;
+    }
+    .result-container {
+        background: var(--white, #fafafa);
+        border-radius: 4px;
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+        position: absolute;
+        left: 20px;
+        top: 102px;
+    }
+
     .result-buttons {
         width: 606px;
         height: 30px;
@@ -1995,6 +1612,7 @@
         display: flex;
         align-items: center;
         justify-content: flex-start;
+        cursor: pointer;
     }
 
     ._16-px-arrow-left {
@@ -2034,7 +1652,7 @@
     }
 
     .result2 {
-        background: var(--white, #fafafa);
+        background: var(--bluebackground, #edeef3);
         border-radius: 4px;
         width: 606px;
         height: 606px;
@@ -2045,15 +1663,13 @@
             --shadow-kachel-box-shadow,
             0px 2px 3px 0px rgba(31, 37, 71, 0.25)
         );
-        overflow: hidden;
     }
 
-    ._00013-3684755116-1 {
-        width: 606px;
-        height: 606px;
+    .image-1 {
         position: absolute;
-        left: 0px;
-        top: 0px;
+        left: 281px;
+        top: 281px;
+        overflow: visible;
     }
 
     .progress {
@@ -2085,9 +1701,9 @@
     }
 
     .rectangle-39 {
-        background: var(--blueaccent-light, #d1dffa);
+        background: var(--blue-heading, #195de5);
         border-radius: 100px;
-        width: 606px;
+        width: var(--percentage, 0);
         height: 7px;
         position: absolute;
         left: 0px;
@@ -2165,9 +1781,8 @@
             0px 2px 3px 0px rgba(31, 37, 71, 0.25)
         );
         border: none;
+        cursor: pointer;
     }
-
-
 
     .button4 {
         background: var(--blueaccent-light, #d1dffa);
@@ -3338,7 +2953,7 @@
         border-style: solid;
         border-color: var(--blueaccent, #195de5);
         border-width: 1px;
-        padding: 5px 4px 5px 5px;
+        padding: 5px;
         display: flex;
         flex-direction: row;
         gap: 2px;
@@ -3443,29 +3058,40 @@
         top: 0px;
     }
 
-    .mediumkacheln {
+    .medium-frame {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        width: 350px;
         position: absolute;
-        inset: 0;
+        left: 0px;
+        top: 31px;
     }
 
     .kachel3 {
         background: var(--bluebackground, #edeef3);
         border-radius: 6px;
-        padding: 4px;
+        border-color: var(--blueaccent, #195de5);
+        border-width: 1px;
+        padding: 5px;
         display: flex;
         flex-direction: column;
         gap: 3px;
         align-items: flex-end;
         justify-content: flex-start;
-        position: absolute;
-        left: 0px;
-        top: 31px;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
         box-shadow: var(
             --shadow-kachel-box-shadow,
             0px 2px 3px 0px rgba(31, 37, 71, 0.25)
         );
         overflow: hidden;
-        border: none;
+        cursor: pointer;
     }
 
     .photography3 {
@@ -3480,63 +3106,6 @@
     .kachel4 {
         background: var(--bluebackground, #edeef3);
         border-radius: 6px;
-        padding: 4px;
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-        align-items: flex-end;
-        justify-content: flex-start;
-        position: absolute;
-        left: 0px;
-        top: 121px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-
-    .kachel5 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        padding: 4px;
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-        align-items: flex-end;
-        justify-content: flex-start;
-        position: absolute;
-        left: 90px;
-        top: 31px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-
-    .kachel6 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        padding: 4px;
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-        align-items: flex-end;
-        justify-content: flex-start;
-        position: absolute;
-        left: 90px;
-        top: 121px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-
-    .kachel7 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
         border-style: solid;
         border-color: var(--blueaccent, #195de5);
         border-width: 1px;
@@ -3546,11 +3115,10 @@
         gap: 3px;
         align-items: flex-start;
         justify-content: flex-start;
+        flex-shrink: 0;
         width: 80px;
         height: 80px;
-        position: absolute;
-        left: 180px;
-        top: 31px;
+        position: relative;
         box-shadow: var(
             --shadow-kachel-box-shadow,
             0px 2px 3px 0px rgba(31, 37, 71, 0.25)
@@ -3567,45 +3135,7 @@
         height: 15px;
     }
 
-    .kachel8 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        padding: 4px;
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-        align-items: flex-end;
-        justify-content: flex-start;
-        position: absolute;
-        left: 180px;
-        top: 121px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-
-    .kachel9 {
-        background: var(--bluebackground, #edeef3);
-        border-radius: 6px;
-        padding: 4px;
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-        align-items: flex-end;
-        justify-content: flex-start;
-        position: absolute;
-        left: 270px;
-        top: 31px;
-        box-shadow: var(
-            --shadow-kachel-box-shadow,
-            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
-        );
-        overflow: hidden;
-    }
-
-    .kachel10 {
+    .kachel5 {
         background: var(--bluebackground, #edeef3);
         border-radius: 6px;
         padding: 5px;
@@ -3614,11 +3144,10 @@
         gap: 3px;
         align-items: flex-start;
         justify-content: flex-start;
+        flex-shrink: 0;
         width: 80px;
         height: 80px;
-        position: absolute;
-        left: 270px;
-        top: 121px;
+        position: relative;
         box-shadow: var(
             --shadow-kachel-box-shadow,
             0px 2px 3px 0px rgba(31, 37, 71, 0.25)
@@ -3822,5 +3351,21 @@
     .projects-span2 {
         color: var(--bluetext, #47536b);
         font: 400 16px "IBM Plex Sans", sans-serif;
+    }
+
+    a:link {
+        text-decoration: none;
+    }
+
+    a:visited {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    a:active {
+        text-decoration: none;
     }
 </style>
