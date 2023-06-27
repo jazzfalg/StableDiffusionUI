@@ -21,7 +21,16 @@
     let batchSize = 4;
     let negativePrompt = "";
     let id = 0;
+    let selectedMedium = null;
+    let selectedButton = null;
+    
     // 172.17.11.23:7860
+
+
+
+    function handleButtonClick(event) {
+        selectedButton = event.target;
+    }
 
     function onKeyDown(e) {
         if (e.key === "Enter" || e.keyCode === 13) {
@@ -230,11 +239,10 @@
             batch.forEach((img) => {
                 let div = document.createElement("div");
                 div.id = "bild";
-                div.classList.add("bild");
                 div.innerHTML =
                     "<img src=" +
                     img +
-                    ' alt="" style="border-radius: 4px; flex-shrink: 0; width: 80px; height: 80px; position: relative;" on:click={console.log("hi")}>';
+                    ' alt="" style="border-radius: 4px; flex-shrink: 0; width: 80px; height: 80px; position: relative;" class="bild" tabindex="1">';
                 div.style.borderRadius = "4px";
                 div.style.flexShrink = "0";
                 div.style.width = "80px";
@@ -256,7 +264,10 @@
         batchImagesContainer.addEventListener("click", (event) => {
             if (event.target instanceof Element) {
                 let clickedDiv = event.target;
-                result = clickedDiv.getAttribute("src");
+                if (clickedDiv.getAttribute("src") != null) {
+                    console.log(clickedDiv);
+                    result = clickedDiv.getAttribute("src");
+                }
             }
         });
     }
@@ -286,7 +297,11 @@
     <div class="result">
         <div class="result-buttons">
             <div class="button">
-                <div class="button2">Save Image</div>
+                <!-- <div class="button2">Save Image</div> -->
+
+                <a href={result} download="new-image-name.png" class="button2"
+                    >Save Image</a
+                >
             </div>
 
             <svg
@@ -669,11 +684,12 @@
         </div>
 
         <div class="negative-content">
-            <div class="negative-content-frame">
-                <div class="negative-prompt-text2">
-                    What should not be on the image?
-                </div>
-            </div>
+           
+                <textarea
+                    bind:value={negativePrompt}
+                    class="content-frame"
+                />
+         
 
             <div class="negative-content2">Negative Content</div>
         </div>
@@ -1002,7 +1018,7 @@
                 <div class="divider3" />
 
                 <div class="techniques-kacheln">
-                    <a href="" on:click={() => createTag("Oil")}>
+                    <a href="" on:click={() => createTag("Oil Painting")}>
                         <div class="kachel">
                             <div class="vorschau">
                                 <img
@@ -1029,7 +1045,7 @@
                         </div>
                     </a>
 
-                    <a href="" on:click={() => createTag("ink painting")}>
+                    <a href="" on:click={() => createTag("Ink Painting")}>
                         <div class="kachel">
                             <div class="vorschau">
                                 <img
@@ -1056,229 +1072,285 @@
                         </div>
                     </a>
 
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
-                        </div>
+                    <a href="" on:click={() => createTag("Brush work")}>
+                        <div class="kachel">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-82"
+                                    src="rectangle-82.png"
+                                />
+                            </div>
 
-                        <svg
-                            class="_10-px-checkbox11"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-
-                        <div class="photography">Brush</div>
-                    </div>
-
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="rectangle-72" src="rectangle-72.png" />
-                        </div>
-
-                        <svg
-                            class="_10-px-checkbox12"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-
-                        <div class="photography">Graffiti</div>
-                    </div>
-
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="airbrush" src="airbrush.png" />
-                        </div>
-
-                        <svg
-                            class="_10-px-checkbox13"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-
-                        <div class="photography">Gouache</div>
-                    </div>
-
-                    <div class="kachel2">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
-                        </div>
-
-                        <div class="text">
                             <svg
-                                class="_10-px-checkbox-checked-filled"
+                                class="_10-px-checkbox11"
                                 width="10"
-                                height="10"
-                                viewBox="0 0 10 10"
+                                height="11"
+                                viewBox="0 0 10 11"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
                             >
                                 <path
-                                    d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM4.375 6.71875L2.8125 5.16959L3.30963 4.6875L4.375 5.733L6.69022 3.4375L7.18766 3.93037L4.375 6.71875Z"
+                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
                                     fill="#195DE6"
                                 />
                             </svg>
 
-                            <div class="photography2">Watercolor</div>
+                            <div class="photography">Brush</div>
                         </div>
-                    </div>
+                    </a>
 
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="gouache" src="gouache.png" />
-                        </div>
+                    <a href="" on:click={() => createTag("Graffiti")}>
+                        <div class="kachel">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-72"
+                                    src="rectangle-72.png"
+                                />
+                            </div>
 
-                        <svg
-                            class="_10-px-checkbox14"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-
-                        <div class="photography">Airbrush</div>
-                    </div>
-
-                    <div class="kachel2">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
-                        </div>
-
-                        <div class="text">
                             <svg
-                                class="_10-px-checkbox-checked-filled2"
+                                class="_10-px-checkbox12"
                                 width="10"
-                                height="10"
-                                viewBox="0 0 10 10"
+                                height="11"
+                                viewBox="0 0 10 11"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
                             >
                                 <path
-                                    d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM4.375 6.71875L2.8125 5.16959L3.30963 4.6875L4.375 5.733L6.69022 3.4375L7.18766 3.93037L4.375 6.71875Z"
+                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
                                     fill="#195DE6"
                                 />
                             </svg>
 
-                            <div class="photography2">Alla Prima</div>
+                            <div class="photography">Graffiti</div>
                         </div>
-                    </div>
+                    </a>
 
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                    <a
+                        href=""
+                        on:click={() => createTag("in the style of Gouache")}
+                    >
+                        <div class="kachel">
+                            <div class="vorschau">
+                                <img class="airbrush" src="airbrush.png" />
+                            </div>
+
+                            <svg
+                                class="_10-px-checkbox13"
+                                width="10"
+                                height="11"
+                                viewBox="0 0 10 11"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                    fill="#195DE6"
+                                />
+                            </svg>
+
+                            <div class="photography">Gouache</div>
                         </div>
+                    </a>
 
-                        <svg
-                            class="_10-px-checkbox15"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
+                    <a
+                        href=""
+                        on:click={() => createTag("Watercolor painting")}
+                    >
+                        <div class="kachel2">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-82"
+                                    src="rectangle-82.png"
+                                />
+                            </div>
 
-                        <div class="photography">Pointilism</div>
-                    </div>
+                            <div class="text">
+                                <svg
+                                    class="_10-px-checkbox-checked-filled"
+                                    width="10"
+                                    height="10"
+                                    viewBox="0 0 10 10"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM4.375 6.71875L2.8125 5.16959L3.30963 4.6875L4.375 5.733L6.69022 3.4375L7.18766 3.93037L4.375 6.71875Z"
+                                        fill="#195DE6"
+                                    />
+                                </svg>
 
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                                <div class="photography2">Watercolor</div>
+                            </div>
                         </div>
+                    </a>
 
-                        <svg
-                            class="_10-px-checkbox16"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
+                    <a href="" on:click={() => createTag("Airbrush work")}>
+                        <div class="kachel">
+                            <div class="vorschau">
+                                <img class="gouache" src="gouache.png" />
+                            </div>
 
-                        <div class="photography">Impasto</div>
-                    </div>
+                            <svg
+                                class="_10-px-checkbox14"
+                                width="10"
+                                height="11"
+                                viewBox="0 0 10 11"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                    fill="#195DE6"
+                                />
+                            </svg>
 
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="rectangle-72" src="rectangle-72.png" />
+                            <div class="photography">Airbrush</div>
                         </div>
+                    </a>
 
-                        <svg
-                            class="_10-px-checkbox17"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
+                    <a
+                        href=""
+                        on:click={() => createTag("Alla Prima painting")}
+                    >
+                        <div class="kachel2">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-82"
+                                    src="rectangle-82.png"
+                                />
+                            </div>
 
-                        <div class="photography">Stippling</div>
-                    </div>
+                            <div class="text">
+                                <svg
+                                    class="_10-px-checkbox-checked-filled2"
+                                    width="10"
+                                    height="10"
+                                    viewBox="0 0 10 10"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM4.375 6.71875L2.8125 5.16959L3.30963 4.6875L4.375 5.733L6.69022 3.4375L7.18766 3.93037L4.375 6.71875Z"
+                                        fill="#195DE6"
+                                    />
+                                </svg>
 
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                                <div class="photography2">Alla Prima</div>
+                            </div>
                         </div>
+                    </a>
 
-                        <svg
-                            class="_10-px-checkbox18"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
+                    <a
+                        href=""
+                        on:click={() => createTag("Pointilism painting")}
+                    >
+                        <div class="kachel">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-82"
+                                    src="rectangle-82.png"
+                                />
+                            </div>
 
-                        <div class="photography">Chiaroscuro</div>
-                    </div>
+                            <svg
+                                class="_10-px-checkbox15"
+                                width="10"
+                                height="11"
+                                viewBox="0 0 10 11"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                    fill="#195DE6"
+                                />
+                            </svg>
+
+                            <div class="photography">Pointilism</div>
+                        </div>
+                    </a>
+
+                    <a href="" on:click={() => createTag("Impasto painting")}>
+                        <div class="kachel">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-82"
+                                    src="rectangle-82.png"
+                                />
+                            </div>
+
+                            <svg
+                                class="_10-px-checkbox16"
+                                width="10"
+                                height="11"
+                                viewBox="0 0 10 11"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                    fill="#195DE6"
+                                />
+                            </svg>
+
+                            <div class="photography">Impasto</div>
+                        </div>
+                    </a>
+
+                    <a href="" on:click={() => createTag("Stippling work")}>
+                        <div class="kachel">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-72"
+                                    src="rectangle-72.png"
+                                />
+                            </div>
+
+                            <svg
+                                class="_10-px-checkbox17"
+                                width="10"
+                                height="11"
+                                viewBox="0 0 10 11"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                    fill="#195DE6"
+                                />
+                            </svg>
+
+                            <div class="photography">Stippling</div>
+                        </div>
+                    </a>
+
+                    <a href="" on:click={() => createTag("Chiaroscuro style")}>
+                        <div class="kachel">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-82"
+                                    src="rectangle-82.png"
+                                />
+                            </div>
+
+                            <svg
+                                class="_10-px-checkbox18"
+                                width="10"
+                                height="11"
+                                viewBox="0 0 10 11"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                    fill="#195DE6"
+                                />
+                            </svg>
+
+                            <div class="photography">Chiaroscuro</div>
+                        </div>
+                    </a>
                 </div>
             </div>
 
@@ -1298,53 +1370,86 @@
                         </div>
                     </a>
 
-                    <div class="kachel3">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                    <a href="" on:click={() => addMedium("A rendering of ")}>
+                        <div class="kachel3">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-82"
+                                    src="rectangle-82.png"
+                                />
+                            </div>
+
+                            <div class="photography3">Rendering</div>
                         </div>
+                    </a>
 
-                        <div class="photography3">Rendering</div>
-                    </div>
+                    <a href="" on:click={() => addMedium("A painting of ")}>
+                        <div class="kachel3">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-72"
+                                    src="rectangle-72.png"
+                                />
+                            </div>
 
-                    <div class="kachel3">
-                        <div class="vorschau">
-                            <img class="rectangle-72" src="rectangle-72.png" />
+                            <div class="photography4">Painting</div>
                         </div>
+                    </a>
 
-                        <div class="photography4">Painting</div>
-                    </div>
+                    <a href="" on:click={() => addMedium("A drawing of ")}>
+                        <div class="kachel3">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-82"
+                                    src="rectangle-82.png"
+                                />
+                            </div>
 
-                    <div class="kachel3">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <div class="photography3">Drawing</div>
                         </div>
+                    </a>
 
-                        <div class="photography3">Drawing</div>
-                    </div>
+                    <a href="" on:click={() => addMedium("A graphic of ")}>
+                        <div class="kachel3">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-82"
+                                    src="rectangle-82.png"
+                                />
+                            </div>
 
-                    <div class="kachel3">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <div class="photography3">Graphic</div>
                         </div>
+                    </a>
 
-                        <div class="photography3">Graphic</div>
-                    </div>
+                    <a href="" on:click={() => addMedium("A print of ")}>
+                        <div class="kachel3">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-82"
+                                    src="rectangle-82.png"
+                                />
+                            </div>
 
-                    <div class="kachel3">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <div class="photography3">Print</div>
                         </div>
+                    </a>
 
-                        <div class="photography3">Print</div>
-                    </div>
+                    <a
+                        href=""
+                        on:click={() => addMedium("A digital artwork of ")}
+                    >
+                        <div class="kachel3">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-82"
+                                    src="rectangle-82.png"
+                                />
+                            </div>
 
-                    <div class="kachel3">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="rectangle-82.png" />
+                            <div class="photography3">Digital Art</div>
                         </div>
-
-                        <div class="photography3">Digital Art</div>
-                    </div>
+                    </a>
 
                     <div class="kachel5">
                         <div class="vorschau">
@@ -1834,7 +1939,7 @@
         overflow: hidden;
     }
 
-    .button3 {
+    :global(.button3) {
         color: var(--white, #fafafa);
         background: var(--blueaccent, #195de5);
         border-radius: 4px;
@@ -2396,7 +2501,7 @@
         position: absolute;
         left: 0px;
         top: 31px;
-        overflow: hidden;
+        overflow-y: scroll;
     }
 
     .negative-prompt-text {
@@ -2453,7 +2558,7 @@
         position: absolute;
         left: 0px;
         top: 31px;
-        overflow: hidden;
+        overflow-y: scroll;
     }
 
     .tag {
@@ -2658,7 +2763,7 @@
         position: absolute;
         left: 0px;
         top: 31px;
-        overflow: hidden;
+        overflow-y: scroll;
     }
 
     .prompt-text {
@@ -3209,6 +3314,11 @@
         cursor: pointer;
     }
 
+    .kachel3:active,
+    .kachel3:focus {
+        outline: 2px solid var(--blue-accent, #195de5) !important;
+    }
+
     .photography3 {
         color: var(--bluetext, #47536b);
         text-align: left;
@@ -3482,5 +3592,9 @@
 
     a:active {
         text-decoration: none;
+    }
+
+    :global(.bild:focus) {
+        outline: 2px solid var(--blue-accent, #195de5) !important;
     }
 </style>
