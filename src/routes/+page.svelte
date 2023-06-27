@@ -1,8 +1,10 @@
 <script>
+    import { browser } from "$app/environment";
+
     let userprompt = "";
     let result = "result_before.png";
     let imgHistory = [];
-    let steps = 2;
+    let steps = 20;
     let cfgScale = 7;
     let processing = false;
     let percentage = 0;
@@ -21,11 +23,24 @@
         }
     }
 
-    function createTag(tag) {
+    // // output.innerHTML = slider.value; // Display the default slider value
 
-        if(rawprompt.substring(tag))
-        return;
-        
+    // // Update the current slider value (each time you drag the slider handle)
+    // slider.oninput = function () {
+    //     output.innerHTML = this.value;
+    // };
+
+    // let rangeValue = document.querySelector(".slider2 .value");
+    // console.log(rangeValue);
+
+    function createTag(tag) {
+        if (rawprompt.includes(tag)) {
+            const element = document.getElementById(tag);
+            element.remove();
+            tags = tags.replace(", " + tag, "");
+            return;
+        }
+
         let div = document.createElement("div");
         div.id = tag;
         div.classList.add("tag");
@@ -133,8 +148,8 @@
             sampler_name: "LMS",
             batch_size: 4,
             n_iter: 1,
-            steps: 2,
-            cfg_scale: 7,
+            steps: steps,
+            cfg_scale: cfgScale,
             width: 128,
             height: 128,
             restore_faces: false,
@@ -190,7 +205,6 @@
     }
 
     function addToHistory(currentImgs) {
-
         currentImgs.forEach((batch) => {
             let batchDiv = document.createElement("div");
             batchDiv.id = "batch" + batchCount;
@@ -204,11 +218,10 @@
             batchDiv.style.background = "#d1dffa";
             batchDiv.style.boxShadow = "0px 2px 3px 0px rgba(31, 37, 71, 0.25)";
 
-
-//             display: flex;
-// padding: 6px;
-// align-items: flex-start;
-// gap: 6px;
+            //             display: flex;
+            // padding: 6px;
+            // align-items: flex-start;
+            // gap: 6px;
 
             document.getElementById("batches").appendChild(batchDiv);
 
@@ -231,12 +244,10 @@
             });
             batchCount++;
         });
+    }
 
-        // let div = document.createElement("div");
-        // div.id = "bild";
-        // div.innerHTML = '<img src=result_before.png alt="">';
-
-        // document.getElementById("batch-1").appendChild(div);
+    if (browser) {
+      
     }
 </script>
 
@@ -482,13 +493,21 @@
             <div class="guidance-scale2">Guidance Scale</div>
 
             <div class="input-field4">
-                <div class="input">15</div>
+                <div class="input">{cfgScale}</div>
             </div>
 
             <div class="slider">
-                <div class="rectangle-25" />
+                <!-- <div class="rectangle-25" /> -->
+                <input
+                    type="range"
+                    min="1"
+                    max="15"
+                    bind:value= {cfgScale}
+                    class="slider2"
+                    id="CFGRange"
+                />
 
-                <div class="ellipse-12" />
+                <!-- <div class="ellipse-12" /> -->
             </div>
 
             <svg
@@ -518,13 +537,20 @@
             <div class="steps2">Steps</div>
 
             <div class="input-field4">
-                <div class="input">45</div>
+                <div class="input">{steps}</div>
             </div>
 
             <div class="slider">
-                <div class="rectangle-25" />
 
-                <div class="ellipse-12" />
+                <input
+                    type="range"
+                    id="stepSlider"
+                    class="slider2"
+                    min="1"
+                    max="50"
+                    step="1"
+                    bind:value={steps}
+                />
             </div>
 
             <svg
@@ -1388,14 +1414,14 @@
         top: 102px;
         display: inline-flex;
         height: 874px;
-       
+
         align-items: flex-start;
         gap: 16px;
         flex-shrink: 0;
         display: inline-flex;
         height: 874px;
         /* padding: 16px 0px; */
-  
+
         align-items: flex-start;
         gap: 16px;
         flex-shrink: 0;
@@ -2133,6 +2159,42 @@
         position: absolute;
         left: 0px;
         top: 27px;
+    }
+
+    .slider2 {
+        -webkit-appearance: none; /* Override default CSS styles */
+        position: absolute;
+        appearance: none;
+        width: 100%; /* Full-width */
+        height: 4px; /* Specified height */
+        background: #d3d3d3; /* Grey background */
+        outline: none; /* Remove outline */
+        opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+        transition: opacity 0.2s;
+    }
+
+    /* Mouse-over effects */
+    .slider2:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+    }
+
+    .slider2::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 9px; /* Set a specific slider handle width */
+        height: 9px; /* Slider handle height */
+        border-radius: 50%;
+        background: var(--bluetext, #47536b); /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .slider2::-moz-range-thumb {
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: var(--bluetext, #47536b); /* Green background */
+        border-radius: 50%;
+        cursor: pointer; /* Cursor on hover */
     }
 
     .rectangle-25 {
