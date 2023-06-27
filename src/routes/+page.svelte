@@ -30,15 +30,9 @@
         }
     }
 
-    // // output.innerHTML = slider.value; // Display the default slider value
-
-    // // Update the current slider value (each time you drag the slider handle)
-    // slider.oninput = function () {
-    //     output.innerHTML = this.value;
-    // };
-
-    // let rangeValue = document.querySelector(".slider2 .value");
-    // console.log(rangeValue);
+    function addMedium(med) {
+        medium = med;
+    }
 
     function createTag(tag) {
         if (rawprompt.includes(tag)) {
@@ -703,312 +697,62 @@
     </div>
 
     <div class="tags3">
-        <div class="styles">
-            <div class="styles2">Styles</div>
+        <div class="tag-container">
+            <div class="styles">
+                <div class="styles2">Styles</div>
 
-            <div class="optional">optional</div>
+                <div class="optional">optional</div>
 
-            <div class="drop-down3">
-                <div class="drop-down2">most relevant</div>
-
-                <svg
-                    class="_8-px-caret-sort3"
-                    width="8"
-                    height="8"
-                    viewBox="0 0 8 8"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z" fill="#47536B" />
-                </svg>
-            </div>
-
-            <div class="frame-18">
-                <div class="chip">
-                    <div class="chip2">Effects</div>
-                </div>
-
-                <div class="chip">
-                    <div class="chip2">Materials</div>
-                </div>
-
-                <div class="chip">
-                    <div class="chip2">Concepts</div>
-                </div>
-
-                <div class="chip3">
-                    <div class="chip4">Movements</div>
-                </div>
-
-                <div class="chip">
-                    <div class="chip2">Other</div>
-                </div>
-            </div>
-
-            <div class="divider2" />
-
-            <div class="styles-kacheln">
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
-                    </div>
+                <div class="drop-down3">
+                    <div class="drop-down2">most relevant</div>
 
                     <svg
-                        class="_10-px-checkbox"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
+                        class="_8-px-caret-sort3"
+                        width="8"
+                        height="8"
+                        viewBox="0 0 8 8"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                     >
                         <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
+                            d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z"
+                            fill="#47536B"
                         />
                     </svg>
-
-                    <div class="photography">Cubism</div>
                 </div>
 
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
+                <div class="frame-18">
+                    <div class="chip">
+                        <div class="chip2">Effects</div>
                     </div>
 
-                    <svg
-                        class="_10-px-checkbox2"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
-
-                    <div class="photography">Surrealism</div>
-                </div>
-
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
+                    <div class="chip">
+                        <div class="chip2">Materials</div>
                     </div>
 
-                    <svg
-                        class="_10-px-checkbox3"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
-
-                    <div class="photography">Renaissance</div>
-                </div>
-
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
+                    <div class="chip">
+                        <div class="chip2">Concepts</div>
                     </div>
 
-                    <svg
-                        class="_10-px-checkbox4"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
-
-                    <div class="photography">Pop Art</div>
-                </div>
-
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-7" src="rectangle-7.png" />
+                    <div class="chip3">
+                        <div class="chip4">Movements</div>
                     </div>
 
-                    <svg
-                        class="_10-px-checkbox5"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
-
-                    <div class="photography">Descriptions</div>
-                </div>
-
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-7" src="rectangle-7.png" />
+                    <div class="chip">
+                        <div class="chip2">Other</div>
                     </div>
-
-                    <svg
-                        class="_10-px-checkbox6"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
-
-                    <div class="photography">Descriptions</div>
                 </div>
 
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-7" src="rectangle-7.png" />
-                    </div>
+                <div class="divider2" />
 
-                    <svg
-                        class="_10-px-checkbox7"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
-
-                    <div class="photography">Descriptions</div>
-                </div>
-
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-7" src="rectangle-7.png" />
-                    </div>
-
-                    <svg
-                        class="_10-px-checkbox8"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
-
-                    <div class="photography">Descriptions</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="techniques">
-            <div class="techniques2">Techniques</div>
-
-            <div class="optional2">optional</div>
-
-            <div class="drop-down3">
-                <div class="drop-down2">most relevant</div>
-
-                <svg
-                    class="_8-px-caret-sort4"
-                    width="8"
-                    height="8"
-                    viewBox="0 0 8 8"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z" fill="#47536B" />
-                </svg>
-            </div>
-
-            <div class="techniques-tabs">
-                <div class="chip">
-                    <div class="chip2">Photography</div>
-                </div>
-
-                <div class="chip">
-                    <div class="chip2">Rendering</div>
-                </div>
-
-                <div class="chip3">
-                    <div class="chip4">Painting</div>
-                </div>
-
-                <div class="chip">
-                    <div class="chip2">Drawing</div>
-                </div>
-
-                <div class="chip">
-                    <div class="chip2">Graphic</div>
-                </div>
-
-                <div class="chip">
-                    <div class="chip2">Print</div>
-                </div>
-
-                <div class="chip">
-                    <div class="chip2">Digital Art</div>
-                </div>
-
-                <div class="chip">
-                    <div class="chip2">Other</div>
-                </div>
-            </div>
-
-            <div class="show-more">
-                <svg
-                    class="_10-px-chevron-down"
-                    width="10"
-                    height="10"
-                    viewBox="0 0 10 10"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M5 6.875L1.875 3.75L2.3125 3.3125L5 6L7.6875 3.3125L8.125 3.75L5 6.875Z"
-                        fill="#195DE6"
-                    />
-                </svg>
-
-                <div class="show-more2">show more</div>
-            </div>
-
-            <div class="divider3" />
-
-            <div class="techniques-kacheln">
-                <a href="" on:click={() => createTag("Oil")}>
+                <div class="styles-kacheln">
                     <div class="kachel">
                         <div class="vorschau">
                             <img class="rectangle-82" src="rectangle-82.png" />
                         </div>
 
                         <svg
-                            class="_10-px-checkbox9"
+                            class="_10-px-checkbox"
                             width="10"
                             height="11"
                             viewBox="0 0 10 11"
@@ -1021,18 +765,16 @@
                             />
                         </svg>
 
-                        <div class="photography">Oil</div>
+                        <div class="photography">Cubism</div>
                     </div>
-                </a>
 
-                <a href="" on:click={() => createTag("ink painting")}>
                     <div class="kachel">
                         <div class="vorschau">
                             <img class="rectangle-82" src="rectangle-82.png" />
                         </div>
 
                         <svg
-                            class="_10-px-checkbox10"
+                            class="_10-px-checkbox2"
                             width="10"
                             height="11"
                             viewBox="0 0 10 11"
@@ -1045,329 +787,597 @@
                             />
                         </svg>
 
-                        <div class="photography">Ink</div>
-                    </div>
-                </a>
-
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
+                        <div class="photography">Surrealism</div>
                     </div>
 
-                    <svg
-                        class="_10-px-checkbox11"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
 
-                    <div class="photography">Brush</div>
-                </div>
-
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-72" src="rectangle-72.png" />
-                    </div>
-
-                    <svg
-                        class="_10-px-checkbox12"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
-
-                    <div class="photography">Graffiti</div>
-                </div>
-
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="airbrush" src="airbrush.png" />
-                    </div>
-
-                    <svg
-                        class="_10-px-checkbox13"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
-
-                    <div class="photography">Gouache</div>
-                </div>
-
-                <div class="kachel2">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
-                    </div>
-
-                    <div class="text">
                         <svg
-                            class="_10-px-checkbox-checked-filled"
+                            class="_10-px-checkbox3"
                             width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
+                            height="11"
+                            viewBox="0 0 10 11"
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
                         >
                             <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM4.375 6.71875L2.8125 5.16959L3.30963 4.6875L4.375 5.733L6.69022 3.4375L7.18766 3.93037L4.375 6.71875Z"
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
                                 fill="#195DE6"
                             />
                         </svg>
 
-                        <div class="photography2">Watercolor</div>
-                    </div>
-                </div>
-
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="gouache" src="gouache.png" />
+                        <div class="photography">Renaissance</div>
                     </div>
 
-                    <svg
-                        class="_10-px-checkbox14"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
 
-                    <div class="photography">Airbrush</div>
-                </div>
-
-                <div class="kachel2">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
-                    </div>
-
-                    <div class="text">
                         <svg
-                            class="_10-px-checkbox-checked-filled2"
+                            class="_10-px-checkbox4"
                             width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
+                            height="11"
+                            viewBox="0 0 10 11"
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
                         >
                             <path
-                                d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM4.375 6.71875L2.8125 5.16959L3.30963 4.6875L4.375 5.733L6.69022 3.4375L7.18766 3.93037L4.375 6.71875Z"
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
                                 fill="#195DE6"
                             />
                         </svg>
 
-                        <div class="photography2">Alla Prima</div>
-                    </div>
-                </div>
-
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
+                        <div class="photography">Pop Art</div>
                     </div>
 
-                    <svg
-                        class="_10-px-checkbox15"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="rectangle-7" src="rectangle-7.png" />
+                        </div>
 
-                    <div class="photography">Pointilism</div>
-                </div>
+                        <svg
+                            class="_10-px-checkbox5"
+                            width="10"
+                            height="11"
+                            viewBox="0 0 10 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
 
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
+                        <div class="photography">Descriptions</div>
                     </div>
 
-                    <svg
-                        class="_10-px-checkbox16"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="rectangle-7" src="rectangle-7.png" />
+                        </div>
 
-                    <div class="photography">Impasto</div>
-                </div>
+                        <svg
+                            class="_10-px-checkbox6"
+                            width="10"
+                            height="11"
+                            viewBox="0 0 10 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
 
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-72" src="rectangle-72.png" />
+                        <div class="photography">Descriptions</div>
                     </div>
 
-                    <svg
-                        class="_10-px-checkbox17"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="rectangle-7" src="rectangle-7.png" />
+                        </div>
 
-                    <div class="photography">Stippling</div>
-                </div>
+                        <svg
+                            class="_10-px-checkbox7"
+                            width="10"
+                            height="11"
+                            viewBox="0 0 10 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
 
-                <div class="kachel">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
+                        <div class="photography">Descriptions</div>
                     </div>
 
-                    <svg
-                        class="_10-px-checkbox18"
-                        width="10"
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="rectangle-7" src="rectangle-7.png" />
+                        </div>
 
-                    <div class="photography">Chiaroscuro</div>
-                </div>
-            </div>
-        </div>
+                        <svg
+                            class="_10-px-checkbox8"
+                            width="10"
+                            height="11"
+                            viewBox="0 0 10 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
 
-        <div class="medium">
-            <div class="medium2">Medium</div>
-
-            <div class="medium-frame">
-                <div class="kachel3">
-                    <div class="vorschau">
-                        <img class="rectangle-7" src="rectangle-7.png" />
+                        <div class="photography">Descriptions</div>
                     </div>
-
-                    <div class="photography3">Photography</div>
-                </div>
-
-                <div class="kachel3">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
-                    </div>
-
-                    <div class="photography3">Rendering</div>
-                </div>
-
-                <div class="kachel3">
-                    <div class="vorschau">
-                        <img class="rectangle-72" src="rectangle-72.png" />
-                    </div>
-
-                    <div class="photography4">Painting</div>
-                </div>
-
-                <div class="kachel3">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
-                    </div>
-
-                    <div class="photography3">Drawing</div>
-                </div>
-
-                <div class="kachel3">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
-                    </div>
-
-                    <div class="photography3">Graphic</div>
-                </div>
-
-                <div class="kachel3">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
-                    </div>
-
-                    <div class="photography3">Print</div>
-                </div>
-
-                <div class="kachel3">
-                    <div class="vorschau">
-                        <img class="rectangle-82" src="rectangle-82.png" />
-                    </div>
-
-                    <div class="photography3">Digital Art</div>
-                </div>
-
-                <div class="kachel5">
-                    <div class="vorschau">
-                        <img class="rectangle-73" src="rectangle-73.png" />
-                    </div>
-
-                    <div class="new-idea">New Idea</div>
-
-                    <svg
-                        class="_32-px-add-filled"
-                        width="32"
-                        height="32"
-                        viewBox="0 0 32 32"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M16 2C12.3009 2.04476 8.76586 3.53412 6.14999 6.14999C3.53412 8.76586 2.04476 12.3009 2 16C2.04476 19.6991 3.53412 23.2341 6.14999 25.85C8.76586 28.4659 12.3009 29.9552 16 30C19.6991 29.9552 23.2341 28.4659 25.85 25.85C28.4659 23.2341 29.9552 19.6991 30 16C29.9552 12.3009 28.4659 8.76586 25.85 6.14999C23.2341 3.53412 19.6991 2.04476 16 2V2ZM24 17H17V24H15V17H8V15H15V8H17V15H24V17Z"
-                            fill="#FAFAFA"
-                        />
-                    </svg>
                 </div>
             </div>
 
-            <div class="medium-devider" />
+            <div class="techniques">
+                <div class="techniques2">Techniques</div>
+
+                <div class="optional2">optional</div>
+
+                <div class="drop-down3">
+                    <div class="drop-down2">most relevant</div>
+
+                    <svg
+                        class="_8-px-caret-sort4"
+                        width="8"
+                        height="8"
+                        viewBox="0 0 8 8"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z"
+                            fill="#47536B"
+                        />
+                    </svg>
+                </div>
+
+                <div class="techniques-tabs">
+                    <div class="chip">
+                        <div class="chip2">Photography</div>
+                    </div>
+
+                    <div class="chip">
+                        <div class="chip2">Rendering</div>
+                    </div>
+
+                    <div class="chip3">
+                        <div class="chip4">Painting</div>
+                    </div>
+
+                    <div class="chip">
+                        <div class="chip2">Drawing</div>
+                    </div>
+
+                    <div class="chip">
+                        <div class="chip2">Graphic</div>
+                    </div>
+
+                    <div class="chip">
+                        <div class="chip2">Print</div>
+                    </div>
+
+                    <div class="chip">
+                        <div class="chip2">Digital Art</div>
+                    </div>
+
+                    <div class="chip">
+                        <div class="chip2">Other</div>
+                    </div>
+                </div>
+
+                <div class="show-more">
+                    <svg
+                        class="_10-px-chevron-down"
+                        width="10"
+                        height="10"
+                        viewBox="0 0 10 10"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M5 6.875L1.875 3.75L2.3125 3.3125L5 6L7.6875 3.3125L8.125 3.75L5 6.875Z"
+                            fill="#195DE6"
+                        />
+                    </svg>
+
+                    <div class="show-more2">show more</div>
+                </div>
+
+                <div class="divider3" />
+
+                <div class="techniques-kacheln">
+                    <a href="" on:click={() => createTag("Oil")}>
+                        <div class="kachel">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-82"
+                                    src="rectangle-82.png"
+                                />
+                            </div>
+
+                            <svg
+                                class="_10-px-checkbox9"
+                                width="10"
+                                height="11"
+                                viewBox="0 0 10 11"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                    fill="#195DE6"
+                                />
+                            </svg>
+
+                            <div class="photography">Oil</div>
+                        </div>
+                    </a>
+
+                    <a href="" on:click={() => createTag("ink painting")}>
+                        <div class="kachel">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-82"
+                                    src="rectangle-82.png"
+                                />
+                            </div>
+
+                            <svg
+                                class="_10-px-checkbox10"
+                                width="10"
+                                height="11"
+                                viewBox="0 0 10 11"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                    fill="#195DE6"
+                                />
+                            </svg>
+
+                            <div class="photography">Ink</div>
+                        </div>
+                    </a>
+
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
+
+                        <svg
+                            class="_10-px-checkbox11"
+                            width="10"
+                            height="11"
+                            viewBox="0 0 10 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
+
+                        <div class="photography">Brush</div>
+                    </div>
+
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="rectangle-72" src="rectangle-72.png" />
+                        </div>
+
+                        <svg
+                            class="_10-px-checkbox12"
+                            width="10"
+                            height="11"
+                            viewBox="0 0 10 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
+
+                        <div class="photography">Graffiti</div>
+                    </div>
+
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="airbrush" src="airbrush.png" />
+                        </div>
+
+                        <svg
+                            class="_10-px-checkbox13"
+                            width="10"
+                            height="11"
+                            viewBox="0 0 10 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
+
+                        <div class="photography">Gouache</div>
+                    </div>
+
+                    <div class="kachel2">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
+
+                        <div class="text">
+                            <svg
+                                class="_10-px-checkbox-checked-filled"
+                                width="10"
+                                height="10"
+                                viewBox="0 0 10 10"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM4.375 6.71875L2.8125 5.16959L3.30963 4.6875L4.375 5.733L6.69022 3.4375L7.18766 3.93037L4.375 6.71875Z"
+                                    fill="#195DE6"
+                                />
+                            </svg>
+
+                            <div class="photography2">Watercolor</div>
+                        </div>
+                    </div>
+
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="gouache" src="gouache.png" />
+                        </div>
+
+                        <svg
+                            class="_10-px-checkbox14"
+                            width="10"
+                            height="11"
+                            viewBox="0 0 10 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
+
+                        <div class="photography">Airbrush</div>
+                    </div>
+
+                    <div class="kachel2">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
+
+                        <div class="text">
+                            <svg
+                                class="_10-px-checkbox-checked-filled2"
+                                width="10"
+                                height="10"
+                                viewBox="0 0 10 10"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M8.125 1.25H1.875C1.70924 1.25 1.55027 1.31585 1.43306 1.43306C1.31585 1.55027 1.25 1.70924 1.25 1.875V8.125C1.25 8.29076 1.31585 8.44973 1.43306 8.56694C1.55027 8.68415 1.70924 8.75 1.875 8.75H8.125C8.29076 8.75 8.44973 8.68415 8.56694 8.56694C8.68415 8.44973 8.75 8.29076 8.75 8.125V1.875C8.75 1.70924 8.68415 1.55027 8.56694 1.43306C8.44973 1.31585 8.29076 1.25 8.125 1.25V1.25ZM4.375 6.71875L2.8125 5.16959L3.30963 4.6875L4.375 5.733L6.69022 3.4375L7.18766 3.93037L4.375 6.71875Z"
+                                    fill="#195DE6"
+                                />
+                            </svg>
+
+                            <div class="photography2">Alla Prima</div>
+                        </div>
+                    </div>
+
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
+
+                        <svg
+                            class="_10-px-checkbox15"
+                            width="10"
+                            height="11"
+                            viewBox="0 0 10 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
+
+                        <div class="photography">Pointilism</div>
+                    </div>
+
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
+
+                        <svg
+                            class="_10-px-checkbox16"
+                            width="10"
+                            height="11"
+                            viewBox="0 0 10 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
+
+                        <div class="photography">Impasto</div>
+                    </div>
+
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="rectangle-72" src="rectangle-72.png" />
+                        </div>
+
+                        <svg
+                            class="_10-px-checkbox17"
+                            width="10"
+                            height="11"
+                            viewBox="0 0 10 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
+
+                        <div class="photography">Stippling</div>
+                    </div>
+
+                    <div class="kachel">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
+
+                        <svg
+                            class="_10-px-checkbox18"
+                            width="10"
+                            height="11"
+                            viewBox="0 0 10 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
+                                fill="#195DE6"
+                            />
+                        </svg>
+
+                        <div class="photography">Chiaroscuro</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="medium">
+                <div class="medium2">Medium</div>
+
+                <div class="medium-frame">
+                    <a href="" on:click={() => addMedium("A photograph of ")}>
+                        <div class="kachel3">
+                            <div class="vorschau">
+                                <img
+                                    class="rectangle-7"
+                                    src="rectangle-7.png"
+                                />
+                            </div>
+                            <div class="photography3">Photography</div>
+                        </div>
+                    </a>
+
+                    <div class="kachel3">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
+
+                        <div class="photography3">Rendering</div>
+                    </div>
+
+                    <div class="kachel3">
+                        <div class="vorschau">
+                            <img class="rectangle-72" src="rectangle-72.png" />
+                        </div>
+
+                        <div class="photography4">Painting</div>
+                    </div>
+
+                    <div class="kachel3">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
+
+                        <div class="photography3">Drawing</div>
+                    </div>
+
+                    <div class="kachel3">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
+
+                        <div class="photography3">Graphic</div>
+                    </div>
+
+                    <div class="kachel3">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
+
+                        <div class="photography3">Print</div>
+                    </div>
+
+                    <div class="kachel3">
+                        <div class="vorschau">
+                            <img class="rectangle-82" src="rectangle-82.png" />
+                        </div>
+
+                        <div class="photography3">Digital Art</div>
+                    </div>
+
+                    <div class="kachel5">
+                        <div class="vorschau">
+                            <img class="rectangle-73" src="rectangle-73.png" />
+                        </div>
+
+                        <div class="new-idea">New Idea</div>
+
+                        <svg
+                            class="_32-px-add-filled"
+                            width="32"
+                            height="32"
+                            viewBox="0 0 32 32"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M16 2C12.3009 2.04476 8.76586 3.53412 6.14999 6.14999C3.53412 8.76586 2.04476 12.3009 2 16C2.04476 19.6991 3.53412 23.2341 6.14999 25.85C8.76586 28.4659 12.3009 29.9552 16 30C19.6991 29.9552 23.2341 28.4659 25.85 25.85C28.4659 23.2341 29.9552 19.6991 30 16C29.9552 12.3009 28.4659 8.76586 25.85 6.14999C23.2341 3.53412 19.6991 2.04476 16 2V2ZM24 17H17V24H15V17H8V15H15V8H17V15H24V17Z"
+                                fill="#FAFAFA"
+                            />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="medium-devider" />
+            </div>
         </div>
 
-        <div class="fade" />
-
-        <div class="scroll-bar2">
+        <!-- <div class="scroll-bar2">
             <div class="rectangle-83" />
 
             <div class="rectangle-92" />
-        </div>
+        </div> -->
 
         <div class="search">
             <div class="search2">search...</div>
@@ -1386,6 +1396,8 @@
                 />
             </svg>
         </div>
+
+        <div class="fade" />
 
         <div class="tags4">Tags</div>
     </div>
