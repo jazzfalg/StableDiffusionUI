@@ -4,7 +4,7 @@
     let userprompt = "";
     let result = "result_before.png";
     let imgHistory = [];
-    let steps = 5;
+    let steps = 20;
     let cfgScale = 7;
     let processing = false;
     let percentage = 0;
@@ -15,8 +15,8 @@
     let batch = [];
     let currentImgs = [];
     let batchCount = 0;
-    let width = 128;
-    let height = 128;
+    let width = 768;
+    let height = 768;
     let batchesToGenerate = 1;
     let batchSize = 4;
     let negativePrompt = "";
@@ -135,9 +135,10 @@
     }, 0);
 
     async function sendPrompt() {
+        console.log(negativePrompt);
         if (processing) {
             console.log("Skip");
-            fetch("http://127.0.0.1:7860/sdapi/v1/skip", {
+            fetch("http://172.17.11.23:7860/sdapi/v1/skip", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -167,7 +168,7 @@
             }
         }, 200);
 
-        await fetch("http://127.0.0.1:7860/sdapi/v1/txt2img", {
+        await fetch("http://172.17.11.23:7860/sdapi/v1/txt2img", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -227,7 +228,7 @@
             subseed_strength: 0,
             seed_resize_from_h: -1,
             seed_resize_from_w: -1,
-            sampler_name: "LMS",
+            sampler_name: "Euler a",
             batch_size: batchSize,
             n_iter: batchesToGenerate,
             steps: steps,
@@ -247,7 +248,7 @@
             override_settings: {},
             override_settings_restore_afterwards: true,
             script_args: [],
-            sampler_index: "k_lms",
+            sampler_index: "k_euler_a",
             send_images: true,
             save_images: false,
             alwayson_scripts: {},
@@ -259,7 +260,7 @@
         if (!processing) return;
 
         fetch(
-            "http://127.0.0.1:7860/sdapi/v1/progress?skip_current_image=false",
+            "http://172.17.11.23:7860/sdapi/v1/progress?skip_current_image=false",
             {
                 method: "GET",
                 headers: {
@@ -507,7 +508,7 @@
 
         <div class="model">
             <div class="drop-down">
-                <div class="drop-down2">v1-5-pruned-ckpt</div>
+                <div class="drop-down2">Stable Diffusion v2.1</div>
 
                 <svg
                     class="_8-px-caret-sort"
