@@ -10,23 +10,24 @@
     let percentage = 0;
     let time = "00:00:00";
     let rawprompt = "";
-    let medium = "A painting of ";
+    let medium = "A photograph of ";
     let tags = "";
     let batch = [];
     let currentImgs = [];
     let batchCount = 0;
-    let width = 768;
-    let height = 768;
+    let width = 512;
+    let height = 512;
     let batchesToGenerate = 1;
     let batchSize = 4;
     let negativePrompt = "";
     let id = 0;
-    let currentMedium = "A painting of ";
+    let currentMedium = "A photograph of ";
     let selectedButton = null;
     let generate = "Generate";
     let blur = false;
     let openConf = false;
     let openIdea = false;
+    let techniquesIndex = 0;
 
     let selectedOil = false;
     let selectedInk = false;
@@ -40,6 +41,56 @@
     let selectedImpasto = false;
     let selectedStippling = false;
     let selectedChiaroscuro = false;
+
+    let currentTabTechniques = "A photograph of ";
+
+    const techniquesPaintingTab = [
+        { name: "Oil Painting", src: "oil.png" },
+        { name: "Ink Painting", src: "ink.png" },
+        { name: "Brush Work", src: "brush.png" },
+        { name: "Graffiti", src: "graffiti.png" },
+        { name: "Gouache", src: "gouache.png" },
+        { name: "Watercolor", src: "watercolor.png" },
+        { name: "Airbrush", src: "airbrush.png" },
+        { name: "Alla Prima", src: "allaprima.png" },
+        { name: "Pointilism", src: "pointilism.png" },
+        { name: "Impasto", src: "impasto.png" },
+        { name: "Stippling", src: "stippling.png" },
+        { name: "Chiaroscuro", src: "chiaroscuro.png" },
+    ];
+
+    const techniquesRenderingTab = [
+        { name: "Shit", src: "oil.png" },
+        { name: "Ink Painting", src: "ink.png" },
+        { name: "Brush Work", src: "brush.png" },
+        { name: "Graffiti", src: "graffiti.png" },
+        { name: "Gouache", src: "gouache.png" },
+        { name: "Watercolor", src: "watercolor.png" },
+        { name: "Airbrush", src: "airbrush.png" },
+        { name: "Alla Prima", src: "allaprima.png" },
+        { name: "Pointilism", src: "pointilism.png" },
+        { name: "Impasto", src: "impasto.png" },
+        { name: "Stippling", src: "stippling.png" },
+        { name: "Chiaroscuro", src: "chiaroscuro.png" },
+    ];
+
+    const techniquesPhotographyTab = [
+        { name: "DSLR", src: "dslr.png" },
+        { name: "Analog", src: "analogfilm.png" },
+        { name: "B&W", src: "bw.png" },
+        { name: "Bokeh", src: "bokeh.png" },
+        { name: "Kerning", src: "kerning.png" },
+        { name: "Portra400", src: "portra400.png" },
+        { name: "HDR", src: "hdr.png" },
+        { name: "Polaroid", src: "polaroid.png" },
+        { name: "Phone", src: "iphone.png" },
+        { name: "Underexposed", src: "underexposed.png" },
+        { name: "Overexposed", src: "over.png" },
+        { name: "Disposable", src: "disposable.png" },
+    ];
+
+    //TechniquesTabs
+    const techniquesTabs = [techniquesPhotographyTab, techniquesRenderingTab, techniquesPaintingTab];
 
     // 172.17.11.23:7860
 
@@ -55,8 +106,24 @@
     }
 
     function addMedium(med) {
+        currentTab1(med);
         currentMedium = med;
         medium = med;
+    }
+
+    function currentTab1(tab) {
+        currentTabTechniques = tab;
+        console.log(tab);
+
+        switch (tab) {
+            case "A photograph of ":
+                techniquesIndex = 0;
+                break;
+            case "A rendering of ":
+                techniquesIndex = 1;
+                break;
+        }
+        console.log(techniquesIndex);
     }
 
     function checkSelected(tag) {
@@ -138,7 +205,7 @@
         console.log(negativePrompt);
         if (processing) {
             console.log("Skip");
-            fetch("http://172.17.11.23:7860/sdapi/v1/skip", {
+            fetch("http://127.0.0.1:7860/sdapi/v1/skip", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -168,7 +235,7 @@
             }
         }, 200);
 
-        await fetch("http://172.17.11.23:7860/sdapi/v1/txt2img", {
+        await fetch("http://127.0.0.1:7860/sdapi/v1/txt2img", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -457,7 +524,7 @@
 
             <div class="progress-100">Progress: {percentage}%</div>
 
-            <div class="_0-00-min">{time} ETA</div>
+            <div class="_0-00-min">{time}</div>
         </div>
 
         <div class="result3">Result</div>
@@ -508,7 +575,7 @@
 
         <div class="model">
             <div class="drop-down">
-                <div class="drop-down2">Stable Diffusion v2.1</div>
+                <div class="drop-down2">v1-5-pruned-ckpt</div>
 
                 <svg
                     class="_8-px-caret-sort"
@@ -781,7 +848,11 @@
         </div>
 
         <div class="negative-content">
-            <textarea bind:value={negativePrompt} class="content-frame" />
+            <textarea
+                bind:value={negativePrompt}
+                class="content-frame"
+                placeholder="What should not be on the image?"
+            />
 
             <div class="negative-content2">Negative Content</div>
         </div>
@@ -799,455 +870,16 @@
                 bind:value={userprompt}
                 on:keydown={onKeyDown}
                 class="content-frame"
+                placeholder="What should be on the image?"
             />
         </div>
         <div class="prompt2">Prompt</div>
     </div>
 
-    <div class="tags3">
-        <div class="tag-container">
-            <div class="styles">
-                <div class="styles2">Styles</div>
-
-                <div class="optional">optional</div>
-
-                <div class="drop-down3">
-                    <div class="drop-down2">most relevant</div>
-
-                    <svg
-                        class="_8-px-caret-sort3"
-                        width="8"
-                        height="8"
-                        viewBox="0 0 8 8"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z"
-                            fill="#47536B"
-                        />
-                    </svg>
-                </div>
-
-                <div class="frame-18">
-                    <div class="chip">
-                        <div class="chip2">Effects</div>
-                    </div>
-
-                    <div class="chip">
-                        <div class="chip2">Materials</div>
-                    </div>
-
-                    <div class="chip">
-                        <div class="chip2">Concepts</div>
-                    </div>
-
-                    <div class="chip3">
-                        <div class="chip4">Movements</div>
-                    </div>
-
-                    <div class="chip">
-                        <div class="chip2">Other</div>
-                    </div>
-                </div>
-
-                <div class="divider2" />
-
-                <div class="styles-kacheln">
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="cubism.png" />
-                        </div>
-
-                        <svg
-                            class="_10-px-checkbox"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-
-                        <div class="photography">Cubism</div>
-                    </div>
-
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="surrealism.png" />
-                        </div>
-
-                        <svg
-                            class="_10-px-checkbox2"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-
-                        <div class="photography">Surrealism</div>
-                    </div>
-
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="renaissance.png" />
-                        </div>
-
-                        <svg
-                            class="_10-px-checkbox3"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-
-                        <div class="photography">Renaissance</div>
-                    </div>
-
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="popart.png" />
-                        </div>
-
-                        <svg
-                            class="_10-px-checkbox4"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-
-                        <div class="photography">Pop Art</div>
-                    </div>
-
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="rectangle-7" src="rectangle-7.png" />
-                        </div>
-
-                        <svg
-                            class="_10-px-checkbox5"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-
-                        <div class="photography">Descriptions</div>
-                    </div>
-
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="rectangle-7" src="rectangle-7.png" />
-                        </div>
-
-                        <svg
-                            class="_10-px-checkbox6"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-
-                        <div class="photography">Descriptions</div>
-                    </div>
-
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="rectangle-7" src="rectangle-7.png" />
-                        </div>
-
-                        <svg
-                            class="_10-px-checkbox7"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-
-                        <div class="photography">Descriptions</div>
-                    </div>
-
-                    <div class="kachel">
-                        <div class="vorschau">
-                            <img class="rectangle-7" src="rectangle-7.png" />
-                        </div>
-
-                        <svg
-                            class="_10-px-checkbox8"
-                            width="10"
-                            height="11"
-                            viewBox="0 0 10 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M8.125 1.75H1.875C1.70924 1.75 1.55027 1.81585 1.43306 1.93306C1.31585 2.05027 1.25 2.20924 1.25 2.375V8.625C1.25 8.79076 1.31585 8.94973 1.43306 9.06694C1.55027 9.18415 1.70924 9.25 1.875 9.25H8.125C8.29076 9.25 8.44973 9.18415 8.56694 9.06694C8.68415 8.94973 8.75 8.79076 8.75 8.625V2.375C8.75 2.20924 8.68415 2.05027 8.56694 1.93306C8.44973 1.81585 8.29076 1.75 8.125 1.75V1.75ZM1.875 8.625V2.375H8.125V8.625H1.875Z"
-                                fill="#195DE6"
-                            />
-                        </svg>
-
-                        <div class="photography">Descriptions</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="techniques">
-                <div class="techniques2">Techniques</div>
-
-                <div class="optional2">optional</div>
-
-                <div class="drop-down3">
-                    <div class="drop-down2">most relevant</div>
-
-                    <svg
-                        class="_8-px-caret-sort4"
-                        width="8"
-                        height="8"
-                        viewBox="0 0 8 8"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z"
-                            fill="#47536B"
-                        />
-                    </svg>
-                </div>
-
-                <div class="techniques-tabs">
-                    <div class="chip">
-                        <div class="chip2">Photography</div>
-                    </div>
-
-                    <div class="chip">
-                        <div class="chip2">Rendering</div>
-                    </div>
-
-                    <div class="chip3">
-                        <div class="chip4">Painting</div>
-                    </div>
-
-                    <div class="chip">
-                        <div class="chip2">Drawing</div>
-                    </div>
-
-                    <div class="chip">
-                        <div class="chip2">Graphic</div>
-                    </div>
-
-                    <div class="chip">
-                        <div class="chip2">Print</div>
-                    </div>
-
-                    <div class="chip">
-                        <div class="chip2">Digital Art</div>
-                    </div>
-
-                    <div class="chip">
-                        <div class="chip2">Other</div>
-                    </div>
-                </div>
-
-                <div class="show-more">
-                    <svg
-                        class="_10-px-chevron-down"
-                        width="10"
-                        height="10"
-                        viewBox="0 0 10 10"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M5 6.875L1.875 3.75L2.3125 3.3125L5 6L7.6875 3.3125L8.125 3.75L5 6.875Z"
-                            fill="#195DE6"
-                        />
-                    </svg>
-
-                    <div class="show-more2">show less</div>
-                </div>
-
-                <div class="divider3" />
-
-                <div class="techniques-kacheln">
-                    <button
-                        class={selectedOil ? "selected" : " "}
-                        on:click={() => createTag("Oil Painting")}
-                    >
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="oil.png" />
-                        </div>
-
-                        <div class="photography3">Oil</div>
-                    </button>
-
-                    <button
-                        class={selectedInk ? "selected" : " "}
-                        on:click={() => createTag("Ink Painting")}
-                    >
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="ink.png" />
-                        </div>
-
-                        <div class="photography3">Ink</div>
-                    </button>
-
-                    <button
-                        class={selectedBrush ? "selected" : " "}
-                        on:click={() => createTag("Brush Work")}
-                    >
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="brush.png" />
-                        </div>
-
-                        <div class="photography3">Brush</div>
-                    </button>
-
-                    <button
-                        class={selectedGraffiti ? "selected" : " "}
-                        on:click={() => createTag("Graffiti")}
-                    >
-                        <div class="vorschau">
-                            <img class="rectangle-72" src="graffiti.png" />
-                        </div>
-
-                        <div class="photography3">Graffiti</div>
-                    </button>
-
-                    <button
-                        class={selectedGouache ? "selected" : " "}
-                        on:click={() => createTag("in the style of Gouache")}
-                    >
-                        <div class="vorschau">
-                            <img class="airbrush" src="gouache.png" />
-                        </div>
-
-                        <div class="photography3">Gouache</div>
-                    </button>
-
-                    <button
-                        class={selectedWatercolor ? "selected" : " "}
-                        on:click={() => createTag("Watercolor painting")}
-                    >
-                        <div class="vorschau">
-                            <img class="rectangle-82" src="watercolor.png" />
-                        </div>
-
-                        <div class="photography3">Watercolor</div>
-                    </button>
-
-                    <button
-                        class={selectedAirbrush ? "selected" : " "}
-                        on:click={() => createTag("Airbrush work")}
-                    >
-                        <div class="vorschau">
-                            <img class="gouache" src="airbrush.png" />
-                        </div>
-
-                        <div class="photography3">Airbrush</div>
-                    </button>
-
-                    <button
-                        class={selectedAllaPrima ? "selected" : " "}
-                        on:click={() => createTag("Alla Prima painting")}
-                    >
-                        <div class="vorschau">
-                            <img class="gouache" src="allaprima.png" />
-                        </div>
-
-                        <div class="photography3">Alla Prima</div>
-                    </button>
-
-                    <button
-                        class={selectedPointilism ? "selected" : " "}
-                        on:click={() => createTag("Pointilism painting")}
-                    >
-                        <div class="vorschau">
-                            <img class="gouache" src="pointilism.png" />
-                        </div>
-
-                        <div class="photography3">Pointilism</div>
-                    </button>
-
-                    <button
-                        class={selectedImpasto ? "selected" : " "}
-                        on:click={() => createTag("Impasto painting")}
-                    >
-                        <div class="vorschau">
-                            <img class="gouache" src="impasto.png" />
-                        </div>
-
-                        <div class="photography3">Impasto</div>
-                    </button>
-
-                    <button
-                        class={selectedStippling ? "selected" : " "}
-                        on:click={() => createTag("Stippling work")}
-                    >
-                        <div class="vorschau">
-                            <img class="gouache" src="stippling.png" />
-                        </div>
-
-                        <div class="photography3">Stippling</div>
-                    </button>
-
-                    <button
-                        class={selectedChiaroscuro ? "selected" : " "}
-                        on:click={() => createTag("Chiaroscuro style")}
-                    >
-                        <div class="vorschau">
-                            <img class="gouache" src="chiaroscuro.png" />
-                        </div>
-
-                        <div class="photography3">Chiaroscuro</div>
-                    </button>
-                </div>
-            </div>
-
-            <div class="medium">
-                <div class="medium2">Medium</div>
-
-                <div class="medium-frame">
+    <div class="tags-new">
+        <div class="scroll-container">
+            <div class="tag-container-new">
+                <div class="medium-new">
                     <button
                         class={currentMedium === "A photograph of "
                             ? "selected"
@@ -1358,39 +990,367 @@
                             </svg>
                         </div>
                     </a>
+
+                    <div class="medium-devider-new" />
+
+                    <div class="medium-devider-new2" />
                 </div>
 
-                <div class="medium-devider" />
+                <div class="techniques-new">
+                    <div class="title-tabs-new">
+                        <div class="techniques-tabs-new">
+                            <!-- <div class="chip">
+                                <div class="chip2">Photography</div>
+                            </div> -->
+
+                            <tab
+                                class={currentTabTechniques ===
+                                "A photograph of "
+                                    ? "selected"
+                                    : ""}
+                                on:click={() => currentTab1("A photograph of ")}
+                            >
+                                Photography</tab
+                            >
+
+                            <tab
+                                class={currentTabTechniques ===
+                                "A rendering of "
+                                    ? "selected"
+                                    : ""}
+                                on:click={() => currentTab1("A rendering of ")}
+                            >
+                                Rendering</tab
+                            >
+
+                            <tab
+                                class={currentTabTechniques === "A painting of "
+                                    ? "selected"
+                                    : ""}
+                                on:click={() => currentTab1("A painting of ")}
+                            >
+                                Painting</tab
+                            >
+
+                            <tab
+                                class={currentTabTechniques === "A drawing of "
+                                    ? "selected"
+                                    : ""}
+                                on:click={() => currentTab1("A drawing of ")}
+                            >
+                                Drawing</tab
+                            >
+
+                            <tab
+                                class={currentTabTechniques === "A graphic of "
+                                    ? "selected"
+                                    : ""}
+                                on:click={() => currentTab1("A graphic of ")}
+                            >
+                                Graphic</tab
+                            >
+
+                            <tab
+                                class={currentTabTechniques === "A print of "
+                                    ? "selected"
+                                    : ""}
+                                on:click={() => currentTab1("A print of ")}
+                            >
+                                Print</tab
+                            >
+
+                            <tab
+                                class={currentTabTechniques ===
+                                "A digital artwork of "
+                                    ? "selected"
+                                    : ""}
+                                on:click={() =>
+                                    currentTab1("A digital artwork of ")}
+                            >
+                                Digital Art</tab
+                            >
+
+                            <tab
+                                class={currentTabTechniques === "Other"
+                                    ? "selected"
+                                    : ""}
+                                on:click={() => currentTab1("Other")}
+                            >
+                                Other</tab
+                            >
+                        </div>
+
+                        <div class="tag-title-new">
+                            <div class="techniques-new2">Techniques</div>
+
+                            <div class="optional-new">optional</div>
+
+                            <div class="drop-down-new">
+                                <div class="new">most relevant</div>
+
+                                <svg
+                                    class="_8-px-caret-sort-new"
+                                    width="8"
+                                    height="8"
+                                    viewBox="0 0 8 8"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z"
+                                        fill="#47536B"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    {#each techniquesTabs[techniquesIndex] as tab, i}
+                        <button
+                            class={rawprompt.includes(tab.name)
+                                ? "selected"
+                                : ""}
+                            on:click={() => createTag(tab.name)}
+                        >
+                            <div class="vorschau">
+                                <img class="rectangle-7" src={tab.src} />
+                            </div>
+                            <div class="photography3">{tab.name}</div>
+                        </button>
+                    {/each}
+
+                    <div class="medium-devider-new" />
+
+                    <div class="medium-devider-new2" />
+                </div>
+
+                <div class="techniques-new">
+                    <div class="title-tabs-new">
+                        <div class="techniques-tabs-new">
+                            <div class="chip">
+                                <div class="chip2">Photography</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Rendering</div>
+                            </div>
+
+                            <div class="chip3">
+                                <div class="chip4">Painting</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Drawing</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Graphic</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Print</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Digital Art</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Other</div>
+                            </div>
+                        </div>
+
+                        <div class="tag-title-new">
+                            <div class="techniques-new2">Techniques</div>
+
+                            <div class="optional-new">optional</div>
+
+                            <div class="drop-down-new">
+                                <div class="new">most relevant</div>
+
+                                <svg
+                                    class="_8-px-caret-sort-new2"
+                                    width="8"
+                                    height="8"
+                                    viewBox="0 0 8 8"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z"
+                                        fill="#47536B"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="medium-devider-new" />
+
+                    <div class="medium-devider-new2" />
+                </div>
+
+                <div class="techniques-new">
+                    <div class="title-tabs-new">
+                        <div class="techniques-tabs-new">
+                            <div class="chip">
+                                <div class="chip2">Photography</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Rendering</div>
+                            </div>
+
+                            <div class="chip3">
+                                <div class="chip4">Painting</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Drawing</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Graphic</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Print</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Digital Art</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Other</div>
+                            </div>
+                        </div>
+
+                        <div class="tag-title-new">
+                            <div class="techniques-new2">Techniques</div>
+
+                            <div class="optional-new">optional</div>
+
+                            <div class="drop-down-new">
+                                <div class="new">most relevant</div>
+
+                                <svg
+                                    class="_8-px-caret-sort-new3"
+                                    width="8"
+                                    height="8"
+                                    viewBox="0 0 8 8"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z"
+                                        fill="#47536B"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="medium-devider-new" />
+
+                    <div class="medium-devider-new2" />
+                </div>
+
+                <div class="techniques-new">
+                    <div class="title-tabs-new">
+                        <div class="techniques-tabs-new">
+                            <div class="chip">
+                                <div class="chip2">Photography</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Rendering</div>
+                            </div>
+
+                            <div class="chip3">
+                                <div class="chip4">Painting</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Drawing</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Graphic</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Print</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Digital Art</div>
+                            </div>
+
+                            <div class="chip">
+                                <div class="chip2">Other</div>
+                            </div>
+                        </div>
+
+                        <div class="tag-title-new">
+                            <div class="techniques-new2">Techniques</div>
+
+                            <div class="optional-new">optional</div>
+
+                            <div class="drop-down-new">
+                                <div class="new">most relevant</div>
+
+                                <svg
+                                    class="_8-px-caret-sort-new4"
+                                    width="8"
+                                    height="8"
+                                    viewBox="0 0 8 8"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="M6 6L4 8L2 6H6ZM2 2L4 0L6 2H2Z"
+                                        fill="#47536B"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="medium-devider-new" />
+
+                    <div class="medium-devider-new2" />
+                </div>
             </div>
         </div>
 
-        <!-- <div class="scroll-bar2">
-                <div class="rectangle-83" />
-    
-                <div class="rectangle-92" />
-            </div> -->
+        <div class="tag-topbar-new">
+            <div class="scroll-bg-new" />
 
-        <div class="search">
-            <div class="search2">search...</div>
+            <div class="search-new">
+                <div class="search-new2">search...</div>
 
-            <svg
-                class="_8-px-search"
-                width="10"
-                height="10"
-                viewBox="0 0 10 10"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-                <path
-                    d="M9.37525 8.93751L6.68775 6.25001C7.87525 4.81251 7.68775 2.62501 6.25025 1.43751C4.81275 0.250009 2.62525 0.437509 1.43775 1.87501C0.250253 3.31251 0.437753 5.50001 1.87525 6.68751C3.12525 7.75001 5.00025 7.75001 6.25025 6.68751L8.93775 9.37501L9.37525 8.93751ZM1.25025 4.06251C1.25025 2.50001 2.50025 1.25001 4.06275 1.25001C5.62525 1.25001 6.87525 2.50001 6.87525 4.06251C6.87525 5.62501 5.62525 6.87501 4.06275 6.87501C2.50025 6.87501 1.25025 5.62501 1.25025 4.06251Z"
-                    fill="#47536B"
-                />
-            </svg>
+                <svg
+                    class="_8-px-searchnew"
+                    width="10"
+                    height="10"
+                    viewBox="0 0 10 10"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M9.37525 8.93751L6.68775 6.25001C7.87525 4.81251 7.68775 2.62501 6.25025 1.43751C4.81275 0.250009 2.62525 0.437509 1.43775 1.87501C0.250253 3.31251 0.437753 5.50001 1.87525 6.68751C3.12525 7.75001 5.00025 7.75001 6.25025 6.68751L8.93775 9.37501L9.37525 8.93751ZM1.25025 4.06251C1.25025 2.50001 2.50025 1.25001 4.06275 1.25001C5.62525 1.25001 6.87525 2.50001 6.87525 4.06251C6.87525 5.62501 5.62525 6.87501 4.06275 6.87501C2.50025 6.87501 1.25025 5.62501 1.25025 4.06251Z"
+                        fill="#47536B"
+                    />
+                </svg>
+            </div>
+
+            <div class="medium-new2">Medium</div>
+
+            <div class="tags-new2">Tags</div>
         </div>
 
-        <div class="fade" />
-
-        <div class="tags4">Tags</div>
+        <div class="fade-new" />
     </div>
 
     <div class="history">
@@ -1405,7 +1365,7 @@
             </div> -->
 
         <div class="history-title">
-            <div class="history-shadow" />
+            <!-- <div class="history-shadow" /> -->
 
             <div class="history-bg" />
 
@@ -3566,8 +3526,44 @@
         font: var(--h-3, 500 11px "IBM Plex Sans", sans-serif);
     }
 
-    .selected {
+    button.selected {
         outline: 2px solid var(--blue-accent, #195de5) !important;
+    }
+
+    tab {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 3px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+        align-items: center;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        cursor: pointer;
+    }
+
+    tab.selected {
+        background: var(--bluemid, #94a0b8);
+        border-radius: 3px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+        align-items: center;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        position: relative;
+        color: var(--white, #fafafa);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
     }
 
     .grey {
@@ -3642,5 +3638,322 @@
         width: 36px;
         height: 36px;
         z-index: 2;
+    }
+
+    /*NEW TAG ----------------------------------------------------------------------------------*/
+
+    .tags-new,
+    .tags-new * {
+        box-sizing: border-box;
+    }
+
+    .tags-new {
+        background: var(--white, #fafafa);
+        border-radius: 12px;
+        width: 407px;
+        height: 906px;
+        position: absolute;
+        left: 20px;
+        top: 64px;
+        overflow: hidden;
+    }
+
+    .tag-container-new {
+        display: flex;
+        flex-direction: column;
+        gap: 0px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 372px;
+        position: absolute;
+        left: 20px;
+        top: 104px;
+        overflow: scroll;
+    }
+
+    .scroll-container {
+        display: flex;
+        width: 395px;
+        height: 896px;
+        position: absolute;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        overflow-y: scroll;
+    }
+
+    .medium-new {
+        padding: 2px 2px 5px 2px;
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        flex-shrink: 0;
+        width: 350px;
+        position: relative;
+        overflow: visible;
+    }
+
+    .medium-devider-new {
+        border-radius: 2px;
+        flex-shrink: 0;
+        width: 350px;
+        height: 2px;
+        position: relative;
+    }
+
+    .medium-devider-new2 {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 2px;
+        flex-shrink: 0;
+        width: 350px;
+        height: 2px;
+        position: relative;
+    }
+
+    .techniques-new {
+        display: flex;
+        flex-direction: row;
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+        width: 350px;
+        padding: 0px 2px;
+        align-items: flex-start;
+        align-content: flex-start;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .title-tabs-new {
+        flex-shrink: 0;
+        width: 350px;
+        height: 102px;
+        position: relative;
+    }
+
+    .techniques-tabs-new {
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        width: 350px;
+        position: absolute;
+        left: 0px;
+        top: 52px;
+    }
+
+    .chip {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 3px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+        align-items: center;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .chip2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .chip3 {
+        background: var(--bluemid, #94a0b8);
+        border-radius: 3px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+        align-items: center;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .chip4 {
+        color: var(--white, #fafafa);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .tag-title-new {
+        width: 350px;
+        height: 23px;
+        position: absolute;
+        left: 0px;
+        top: 13px;
+    }
+
+    .techniques-new2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        width: 98px;
+        height: 23px;
+    }
+
+    .optional-new {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: 300 16px "IBM Plex Sans", sans-serif;
+        position: absolute;
+        left: 98px;
+        top: 0px;
+    }
+
+    .drop-down-new {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 3px;
+        border-style: solid;
+        border-color: var(--bluemid, #94a0b8);
+        border-width: 1px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100px;
+        position: absolute;
+        left: 250px;
+        top: 0px;
+    }
+
+    .new {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    ._8-px-caret-sort-new {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._8-px-caret-sort-new2 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._8-px-caret-sort-new3 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    ._8-px-caret-sort-new4 {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .tag-topbar-new {
+        width: 407px;
+        height: 104px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        overflow: hidden;
+    }
+
+    .scroll-bg-new {
+        background: #fafafa;
+        width: 407px;
+        height: 104px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .search-new {
+        background: var(--bluebackground, #edeef3);
+        border-radius: 3px;
+        border-style: solid;
+        border-color: var(--bluemid, #94a0b8);
+        border-width: 1px;
+        padding: 4px 8px 4px 8px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 170px;
+        position: absolute;
+        left: 200px;
+        top: 26px;
+    }
+
+    .search-new2 {
+        color: var(--bluemid, #94a0b8);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    ._8-px-searchnew {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+    }
+
+    .medium-new2 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--h-2, 500 16px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 20px;
+        top: 69px;
+    }
+
+    .tags-new2 {
+        color: var(--blue-heading, #1f4ead);
+        text-align: left;
+        font: var(--h-1, 500 24px "IBM Plex Sans", sans-serif);
+        position: absolute;
+        left: 20px;
+        top: 20px;
+    }
+
+    .fade-new {
+        background: var(
+            --fade,
+            linear-gradient(
+                180deg,
+                rgba(250, 250, 250, 0) 0%,
+                rgba(250, 250, 250, 1) 89.58333134651184%
+            )
+        );
+        width: 407px;
+        height: 90px;
+        position: absolute;
+        left: 0px;
+        top: 816px;
     }
 </style>
