@@ -28,6 +28,7 @@
     let openConf = false;
     let openIdea = false;
     let techniquesIndex = 0;
+    let stylesIndex = 0;
 
     let selectedOil = false;
     let selectedInk = false;
@@ -43,56 +44,275 @@
     let selectedChiaroscuro = false;
 
     let currentTabTechniques = "A photograph of ";
+    let currentTabStyles = "Effects";
 
     const techniquesPaintingTab = [
-        { name: "Oil Painting", src: "oil.png" },
-        { name: "Ink Painting", src: "ink.png" },
-        { name: "Brush Work", src: "brush.png" },
-        { name: "Graffiti", src: "graffiti.png" },
-        { name: "Gouache", src: "gouache.png" },
-        { name: "Watercolor", src: "watercolor.png" },
-        { name: "Airbrush", src: "airbrush.png" },
-        { name: "Alla Prima", src: "allaprima.png" },
-        { name: "Pointilism", src: "pointilism.png" },
-        { name: "Impasto", src: "impasto.png" },
-        { name: "Stippling", src: "stippling.png" },
-        { name: "Chiaroscuro", src: "chiaroscuro.png" },
+        { name: "Oil Painting", src: "oil.png", prompt: "oil painting" },
+        { name: "Ink Painting", src: "ink.png", prompt: "ink painting" },
+        { name: "Brush Work", src: "brush.png", prompt: "brush work" },
+        { name: "Graffiti", src: "graffiti.png", prompt: "graffiti art" },
+        { name: "Gouache", src: "gouache.png", prompt: "gouache painting" },
+        {
+            name: "Watercolor",
+            src: "watercolor.png",
+            prompt: "watercolor painting",
+        },
+        { name: "Airbrush", src: "airbrush.png", prompt: "airbrush artwork" },
+        {
+            name: "Alla Prima",
+            src: "allaprima.png",
+            prompt: "alla prima painting",
+        },
+        {
+            name: "Pointilism",
+            src: "pointilism.png",
+            prompt: "in the style of pointilism",
+        },
+        { name: "Impasto", src: "impasto.png", prompt: "impasto painting" },
+        { name: "Stippling", src: "stippling.png", prompt: "stippiling style" },
+        {
+            name: "Chiaroscuro",
+            src: "chiaroscuro.png",
+            prompt: "chiaroscuro painting",
+        },
     ];
 
     const techniquesRenderingTab = [
-        { name: "Shit", src: "oil.png" },
-        { name: "Ink Painting", src: "ink.png" },
-        { name: "Brush Work", src: "brush.png" },
-        { name: "Graffiti", src: "graffiti.png" },
-        { name: "Gouache", src: "gouache.png" },
-        { name: "Watercolor", src: "watercolor.png" },
-        { name: "Airbrush", src: "airbrush.png" },
-        { name: "Alla Prima", src: "allaprima.png" },
-        { name: "Pointilism", src: "pointilism.png" },
-        { name: "Impasto", src: "impasto.png" },
-        { name: "Stippling", src: "stippling.png" },
-        { name: "Chiaroscuro", src: "chiaroscuro.png" },
+        { name: "Raytracing", src: "raytracing.png", prompt: "raytraced" },
+        { name: "3D Model", src: "3dmodel.png", prompt: "3d modeling" },
+        { name: "Radiosity", src: "radiosity.png", prompt: "radiosity" },
+        { name: "Cartoon", src: "cartoon.png", prompt: "cartoon" },
+        { name: "Low-Poly", src: "low-poly.png", prompt: "low-poly" },
+        { name: "Octane", src: "octane.png", prompt: "octane rendering" },
+        { name: "Redshift", src: "redshift.png", prompt: "redshift rendering" },
+        {
+            name: "Physics",
+            src: "physicssimulation.png",
+            prompt: "physics simulation",
+        },
     ];
 
     const techniquesPhotographyTab = [
-        { name: "DSLR", src: "dslr.png" },
-        { name: "Analog", src: "analogfilm.png" },
-        { name: "B&W", src: "bw.png" },
-        { name: "Bokeh", src: "bokeh.png" },
-        { name: "Kerning", src: "kerning.png" },
-        { name: "Portra400", src: "portra400.png" },
-        { name: "HDR", src: "hdr.png" },
-        { name: "Polaroid", src: "polaroid.png" },
-        { name: "Phone", src: "iphone.png" },
-        { name: "Underexposed", src: "underexposed.png" },
-        { name: "Overexposed", src: "over.png" },
-        { name: "Disposable", src: "disposable.png" },
+        { name: "DSLR", src: "dslr.png", prompt: "DSLR" },
+        { name: "Analog", src: "analogfilm.png", prompt: "analog film" },
+        { name: "B&W", src: "bw.png", prompt: "black and white" },
+        { name: "Bokeh", src: "bokeh.png", prompt: "bokeh" },
+        { name: "Kerning", src: "kerning.png", prompt: "kerning" },
+        { name: "Portra400", src: "portra400.png", prompt: "Portra 400" },
+        { name: "HDR", src: "hdr.png", prompt: "HDR photo" },
+        { name: "Polaroid", src: "polaroid.png", prompt: "polaroid picture" },
+        { name: "Phone", src: "iphone.png", prompt: "iPhone picture" },
+        {
+            name: "Underexposed",
+            src: "underexposed.png",
+            prompt: "underexposed",
+        },
+        { name: "Overexposed", src: "over.png", prompt: "overexposed" },
+        {
+            name: "Disposable",
+            src: "disposable.png",
+            prompt: "disposable camera",
+        },
     ];
 
-    //TechniquesTabs
-    const techniquesTabs = [techniquesPhotographyTab, techniquesRenderingTab, techniquesPaintingTab];
+    const techniquesDrawingTab = [
+        { name: "Sketch", src: "sketch.png", prompt: "sketch drawing" },
+        {
+            name: "Child Drawing",
+            src: "childrensdrawing.png",
+            prompt: "drawn by a child",
+        },
+        { name: "Line Art", src: "lineart.png", prompt: "line art" },
+        { name: "Hand Drawn", src: "handdrawn.png", prompt: "hand drawn" },
+        { name: "Doodle", src: "doodle.png", prompt: "simple doodle" },
+        { name: "Dot Art", src: "dotart.png", prompt: "dotart" },
+        { name: "Anime", src: "anime.png", prompt: "in the style of anime" },
+        { name: "Tattoo", src: "tattoo.png", prompt: "tattoo" },
+        { name: "Naive", src: "naive.png", prompt: "naive style" },
+        { name: "Chalk", src: "chalk.png", prompt: "chalk artwork" },
+        { name: "Pencil", src: "pencil.png", prompt: "pencil drawing" },
+        {
+            name: "Graphic Novel",
+            src: "novel.png",
+            prompt: "in the style of a graphic novel",
+        },
+        { name: "Crayon", src: "crayon.png", prompt: "crayon drawing" },
+    ];
 
-    // 172.17.11.23:7860
+    const techniquesGraphicTab = [
+        { name: "Vector", src: "vector.png", prompt: "vector-look" },
+        {
+            name: "Data",
+            src: "datavisualization.png",
+            prompt: "data visualization",
+        },
+        { name: "Web", src: "web.png", prompt: "web style" },
+        { name: "Key Screens", src: "keyscreens.png", prompt: "key screens" },
+        { name: "Moodboard", src: "moodboard.png", prompt: "moodboard" },
+    ];
+
+    const techniquesPrintTab = [
+        { name: "Blueprint", src: "blueprint.png", prompt: "blueprint" },
+        { name: "Stamp", src: "stamp.png", prompt: "stamp" },
+        { name: "Collage", src: "collage.png", prompt: "photo collage" },
+        { name: "Magazine", src: "magazine.png", prompt: "magazine" },
+        { name: "Lithography", src: "lithography.png", prompt: "lithography" },
+        {
+            name: "Contact Print",
+            src: "contactprint.png",
+            prompt: "contact print",
+        },
+        { name: "Newspaper", src: "newspaper.png", prompt: "newspaper" },
+        { name: "Booklet", src: "booklet.png", prompt: "booklet" },
+        {
+            name: "Graphic Novel",
+            src: "graphicnovel.png",
+            prompt: "graphic novel",
+        },
+    ];
+
+    const techniquesDigitalArtTab = [
+        {
+            name: "Illustration",
+            src: "illustration.png",
+            prompt: "digital art illustration",
+        },
+        {
+            name: "Pixel Art",
+            src: "pixelart.png",
+            prompt: "in the style of pixel art",
+        },
+        { name: "Manga", src: "manga.png", prompt: "manga style" },
+        { name: "8-Bit", src: "8bit.png", prompt: "8-bit style" },
+        { name: "16-Bit", src: "16bit.png", prompt: "16-bit style" },
+        { name: "Concept", src: "concept.png", prompt: "concept digital art" },
+    ];
+
+    const techniquesOtherTab = [
+        { name: "Mosaic", src: "mosaic.png", prompt: "mosaic" },
+        { name: "Carving", src: "carving.png", prompt: "carving" },
+        { name: "Engraving", src: "engraving.png", prompt: "engraving" },
+        { name: "Etching", src: "etching.png", prompt: "etching" },
+        { name: "Embroidery", src: "embroidery.png", prompt: "embroidery" },
+        { name: "Paper Cut", src: "papercut.png", prompt: "papercut style" },
+    ];
+
+    const stylesEffectsTab = [
+        { name: "2D", src: "2d.png", prompt: "2d style" },
+        { name: "3D", src: "3d.png", prompt: "3d style" },
+        { name: "Vignette", src: "vignette.png", prompt: "heavy vignetting" },
+        {
+            name: "Blurring",
+            src: "blurring.png",
+            prompt: "extreme blur, unsharp",
+        },
+        {
+            name: "Distortion",
+            src: "distort.png",
+            prompt: "distorted, digital distortion",
+        },
+        {
+            name: "Turbulent",
+            src: "turbulent.png",
+            prompt: "turbulent displacement, digital distortion",
+        },
+        {
+            name: "Warp",
+            src: "warped.png",
+            prompt: "warped distortion, digital distortion",
+        },
+        { name: "Swirl", src: "swirl.png", prompt: "swirled" },
+    ];
+
+    const stylesMaterialsTab = [
+        { name: "Canvas", src: "canvas.png", prompt: "on a canvas" },
+        { name: "Paper", src: "paper.png", prompt: "made out of paper" },
+        { name: "Metal", src: "metal.png", prompt: "made out of metal" },
+        {
+            name: "Yarn",
+            src: "yarn.png",
+            prompt: "made out of yarn",
+        },
+        {
+            name: "Clay",
+            src: "clay.png",
+            prompt: "made out of clay",
+        },
+        {
+            name: "Wood",
+            src: "wood.png",
+            prompt: "made out of wood",
+        },
+        {
+            name: "Glass",
+            src: "glass.png",
+            prompt: "made out of glass",
+        },
+        { name: "Fabric", src: "fabric.png", prompt: "made out of fabric" },
+        { name: "Crystal", src: "crystal.png", prompt: "made out of crystal" },
+    ]
+
+    const stylesConceptsTab = [
+        { name: "Realistic", src: "realistic.png", prompt: "realistic" },
+        { name: "Chaotic", src: "chaotic.png", prompt: "chaotic" },
+        { name: "Simple", src: "simple.png", prompt: "simple, minimal" },
+        {
+            name: "Kitschy",
+            src: "kitschy.png",
+            prompt: "kitschy",
+        },
+        {
+            name: "Nostalgic",
+            src: "nostalgic.png",
+            prompt: "nostalgic",
+        },
+        {
+            name: "Beautiful",
+            src: "beautiful.png",
+            prompt: "beautiful",
+        },
+        {
+            name: "Divine",
+            src: "divine.png",
+            prompt: "divine",
+        },
+        { name: "Abstract", src: "abstract.png", prompt: "abstract" },
+    ]
+
+
+    const stylesMovementsTab = [
+        { name: "Modern Art", src: "modernart.png", prompt: "in the style of modern art" },
+        { name: "Renaissance", src: "renaissance.png", prompt: "in the style of renaissance art" },
+        { name: "Minimalism", src: "minimalism.png", prompt: "in the style of minimalist art" },
+        { name: "Maximalism", src: "maximalism.png", prompt: "in the style of maximalist art" },
+        { name: "Baroque", src: "baroque.png", prompt: "in the style of baroque art" },
+        { name: "Rococo", src: "rococo.png", prompt: "in the style of rococo art" },
+        { name: "Neoclassism", src: "neoclassism.png", prompt: "in the style of neoclassist art" },
+        { name: "Impression...", src: "impressionism.png", prompt: "in the style of impressionist art" },
+        { name: "Post-Impre...", src: "post-impressionism.png", prompt: "in the style of post-impressionism art" },
+        { name: "Fauvism", src: "fauvism.png", prompt: "in the style of fauvist art" },
+        { name: "Expressionism", src: "expressionism.png", prompt: "in the style of expressionist art" },
+        { name: "Surrealism", src: "surrealism.png", prompt: "in the style of surrealist art" },
+        { name: "Postmodern...", src: "postmodernism.png", prompt: "in the style of post-modernist art" },
+       
+    ]
+
+    //TechniquesTabs
+    const techniquesTabs = [
+        techniquesPhotographyTab,
+        techniquesRenderingTab,
+        techniquesPaintingTab,
+        techniquesDrawingTab,
+        techniquesGraphicTab,
+        techniquesPrintTab,
+        techniquesDigitalArtTab,
+        techniquesOtherTab,
+    ];
+
+    //StylesTabs
+    const stylesTabs = [stylesEffectsTab, stylesMaterialsTab, stylesConceptsTab, stylesMovementsTab];
+
+    // 172.17.11.32:7860
 
     function handleButtonClick(event) {
         selectedButton = event.target;
@@ -113,7 +333,6 @@
 
     function currentTab1(tab) {
         currentTabTechniques = tab;
-        console.log(tab);
 
         switch (tab) {
             case "A photograph of ":
@@ -122,8 +341,52 @@
             case "A rendering of ":
                 techniquesIndex = 1;
                 break;
+
+            case "A painting of ":
+                techniquesIndex = 2;
+                break;
+
+            case "A drawing of ":
+                techniquesIndex = 3;
+                break;
+
+            case "A graphic of ":
+                techniquesIndex = 4;
+                break;
+
+            case "A print of ":
+                techniquesIndex = 5;
+                break;
+
+            case "A digital artwork of ":
+                techniquesIndex = 6;
+                break;
+
+            case "Other":
+                techniquesIndex = 7;
+                break;
         }
-        console.log(techniquesIndex);
+    }
+
+    function currentTab2(tab) {
+        currentTabStyles = tab;
+
+        switch (tab) {
+            case "Effects":
+                stylesIndex = 0;
+                break;
+            case "Materials":
+                stylesIndex = 1;
+                break;
+
+            case "Concepts":
+                stylesIndex = 2;
+                break;
+
+            case "Movements":
+                stylesIndex = 3;
+                break;
+        }
     }
 
     function checkSelected(tag) {
@@ -205,7 +468,7 @@
         console.log(negativePrompt);
         if (processing) {
             console.log("Skip");
-            fetch("http://127.0.0.1:7860/sdapi/v1/skip", {
+            fetch("http://172.17.11.32:7860/sdapi/v1/skip", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -235,7 +498,7 @@
             }
         }, 200);
 
-        await fetch("http://127.0.0.1:7860/sdapi/v1/txt2img", {
+        await fetch("http://172.17.11.32:7860/sdapi/v1/txt2img", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -327,7 +590,7 @@
         if (!processing) return;
 
         fetch(
-            "http://172.17.11.23:7860/sdapi/v1/progress?skip_current_image=false",
+            "http://172.17.11.32:7860/sdapi/v1/progress?skip_current_image=false",
             {
                 method: "GET",
                 headers: {
@@ -575,7 +838,7 @@
 
         <div class="model">
             <div class="drop-down">
-                <div class="drop-down2">v1-5-pruned-ckpt</div>
+                <div class="drop-down2">Realistic Vision V2</div>
 
                 <svg
                     class="_8-px-caret-sort"
@@ -1107,10 +1370,10 @@
 
                     {#each techniquesTabs[techniquesIndex] as tab, i}
                         <button
-                            class={rawprompt.includes(tab.name)
+                            class={rawprompt.includes(tab.prompt)
                                 ? "selected"
                                 : ""}
-                            on:click={() => createTag(tab.name)}
+                            on:click={() => createTag(tab.prompt)}
                         >
                             <div class="vorschau">
                                 <img class="rectangle-7" src={tab.src} />
@@ -1125,43 +1388,47 @@
                 </div>
 
                 <div class="techniques-new">
-                    <div class="title-tabs-new">
+                    <div class="title-tabs-new2">
                         <div class="techniques-tabs-new">
-                            <div class="chip">
-                                <div class="chip2">Photography</div>
-                            </div>
+                            <tab
+                                class={currentTabStyles === "Effects"
+                                    ? "selected"
+                                    : ""}
+                                on:click={() => currentTab2("Effects")}
+                            >
+                                Effects</tab
+                            >
 
-                            <div class="chip">
-                                <div class="chip2">Rendering</div>
-                            </div>
+                            <tab
+                                class={currentTabStyles === "Materials"
+                                    ? "selected"
+                                    : ""}
+                                on:click={() => currentTab2("Materials")}
+                            >
+                                Materials</tab
+                            >
 
-                            <div class="chip3">
-                                <div class="chip4">Painting</div>
-                            </div>
+                            <tab
+                                class={currentTabStyles === "Concepts"
+                                    ? "selected"
+                                    : ""}
+                                on:click={() => currentTab2("Concepts")}
+                            >
+                                Concepts</tab
+                            >
 
-                            <div class="chip">
-                                <div class="chip2">Drawing</div>
-                            </div>
-
-                            <div class="chip">
-                                <div class="chip2">Graphic</div>
-                            </div>
-
-                            <div class="chip">
-                                <div class="chip2">Print</div>
-                            </div>
-
-                            <div class="chip">
-                                <div class="chip2">Digital Art</div>
-                            </div>
-
-                            <div class="chip">
-                                <div class="chip2">Other</div>
-                            </div>
+                            <tab
+                                class={currentTabStyles === "Movements"
+                                    ? "selected"
+                                    : ""}
+                                on:click={() => currentTab2("Movements")}
+                            >
+                                Movements</tab
+                            >
                         </div>
 
                         <div class="tag-title-new">
-                            <div class="techniques-new2">Techniques</div>
+                            <div class="techniques-new2">Styles</div>
 
                             <div class="optional-new">optional</div>
 
@@ -1184,6 +1451,20 @@
                             </div>
                         </div>
                     </div>
+
+                    {#each stylesTabs[stylesIndex] as tab, i}
+                        <button
+                            class={rawprompt.includes(tab.prompt)
+                                ? "selected"
+                                : ""}
+                            on:click={() => createTag(tab.prompt)}
+                        >
+                            <div class="vorschau">
+                                <img class="rectangle-7" src={tab.src} />
+                            </div>
+                            <div class="photography3">{tab.name}</div>
+                        </button>
+                    {/each}
 
                     <div class="medium-devider-new" />
 
@@ -1447,7 +1728,7 @@
 
         display: flex;
         width: 372px;
-        padding: 13px 22px 13px 0px;
+        padding: 0px 22px 13px 0px;
         align-items: flex-start;
         align-content: flex-start;
         gap: 16px;
@@ -3211,6 +3492,15 @@
         height: 16px;
     }
 
+    .photography4 {
+        color: var(--bluetext, #47536b);
+        text-align: left;
+        font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
+        position: relative;
+        width: 71px;
+        height: 16px;
+    }
+
     .kachel4 {
         background: var(--bluebackground, #edeef3);
         border-radius: 6px;
@@ -3238,7 +3528,9 @@
         color: var(--bluetext, #47536b);
         text-align: left;
         font: var(--text, 400 11px "IBM Plex Sans", sans-serif);
-        position: relative;
+        position: absolute;
+        left: 21px;
+        top: 61px;
         width: 70px;
         height: 15px;
     }
@@ -3530,6 +3822,33 @@
         outline: 2px solid var(--blue-accent, #195de5) !important;
     }
 
+    button3 {
+        all: unset;
+        background-image: url("unselected.png");
+        border-radius: 6px;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        align-items: flex-end;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        position: relative;
+        box-shadow: var(
+            --shadow-kachel-box-shadow,
+            0px 2px 3px 0px rgba(31, 37, 71, 0.25)
+        );
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    button3.selected {
+        background-image: url("selected.png");
+        outline: 2px solid var(--blue-accent, #195de5) !important;
+    }
+
     tab {
         background: var(--bluebackground, #edeef3);
         border-radius: 3px;
@@ -3731,6 +4050,13 @@
         flex-shrink: 0;
         width: 350px;
         height: 102px;
+        position: relative;
+    }
+
+    .title-tabs-new2 {
+        flex-shrink: 0;
+        width: 350px;
+        height: 75px;
         position: relative;
     }
 
